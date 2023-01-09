@@ -5,8 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import pl.smarthouse.smartmodule.model.actors.actor.Actor;
 import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
-import pl.smarthouse.smartmodule.model.actors.typelibs.BME280.BME280;
-import pl.smarthouse.smartmodule.model.actors.typelibs.PWM.PWM;
+import pl.smarthouse.smartmodule.model.actors.type.BME280.BME280;
+import pl.smarthouse.smartmodule.model.actors.type.PWM.PWM;
+import pl.smarthouse.smartmodule.model.actors.type.pin.Pin;
+import pl.smarthouse.smartmodule.model.actors.type.pin.PinMode;
+import pl.smarthouse.smartmodule.model.actors.type.pin.PinState;
 import pl.smarthouse.smartmodule.services.ManagerService;
 import pl.smarthouse.smartmodule.services.ModuleService;
 
@@ -16,11 +19,13 @@ import javax.annotation.PostConstruct;
 @Getter
 public class ModuleConfig {
   // Actors
+
   // Temp, humid, pressure sensors
   public static final String BME280_INLET = "bme280_inlet";
   public static final String BME280_OUTLET = "bme280_outlet";
   public static final String BME280_FRESH_AIR = "bme280_fresh_air";
   public static final String BME280_USED_AIR = "bme280_used_air";
+
   // Fan PWM controllers
   // Generic
   public static final int FAN_FREQUENCY = 1000;
@@ -33,6 +38,10 @@ public class ModuleConfig {
   public static final String FAN_OUTLET = "fan_outlet";
   public static final int FAN_OUTLET_CHANNEL = 3;
   public static final int FAN_OUTLET_PIN = 2;
+
+  // Circuit pomp
+  public static final String PUMP = "pump";
+  public static final int CIRCUIT_PUMP_PIN = 17;
 
   // Module specific
   private static final String FIRMWARE = "20230107.00";
@@ -77,6 +86,10 @@ public class ModuleConfig {
             FAN_OUTLET_PIN,
             0,
             true));
+
+    // Circuit pump
+    actorMap.putActor(new Pin(PUMP, CIRCUIT_PUMP_PIN, PinMode.OUTPUT, PinState.LOW, false));
+
     return actorMap;
   }
 
