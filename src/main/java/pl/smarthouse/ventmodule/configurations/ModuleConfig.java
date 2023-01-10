@@ -38,6 +38,12 @@ public class ModuleConfig {
   public static final String FAN_OUTLET = "fan_outlet";
   public static final int FAN_OUTLET_CHANNEL = 3;
   public static final int FAN_OUTLET_PIN = 2;
+  // Revs counters
+  public static final String FAN_OUTLET_REV_COUNTER = "fan_outlet_rev";
+  public static final int FAN_OUTLET_REV_COUNTER_PIN = 15;
+  public static final String FAN_INLET_REV_COUNTER = "fan_inlet_rev";
+  public static final int FAN_INLET_REV_COUNTER_PIN = 32;
+  public static final int TIMEBASE_IN_SECONDS = 10;
 
   // Circuit pomp
   public static final String PUMP = "pump";
@@ -86,6 +92,18 @@ public class ModuleConfig {
             FAN_OUTLET_PIN,
             0,
             true));
+    actorMap.putActor(
+        new Pin(
+            FAN_INLET_REV_COUNTER,
+            FAN_INLET_REV_COUNTER_PIN,
+            PinMode.LOW_STATE_COUNTER,
+            TIMEBASE_IN_SECONDS));
+    actorMap.putActor(
+        new Pin(
+            FAN_OUTLET_REV_COUNTER,
+            FAN_OUTLET_REV_COUNTER_PIN,
+            PinMode.LOW_STATE_COUNTER,
+            TIMEBASE_IN_SECONDS));
 
     // Circuit pump
     actorMap.putActor(new Pin(PUMP, CIRCUIT_PUMP_PIN, PinMode.OUTPUT, PinState.LOW, false));
