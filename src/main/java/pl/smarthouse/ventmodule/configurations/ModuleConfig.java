@@ -5,11 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import pl.smarthouse.smartmodule.model.actors.actor.Actor;
 import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
-import pl.smarthouse.smartmodule.model.actors.type.BME280.BME280;
-import pl.smarthouse.smartmodule.model.actors.type.PWM.PWM;
+import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280;
+import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685;
 import pl.smarthouse.smartmodule.model.actors.type.pin.Pin;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinMode;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinState;
+import pl.smarthouse.smartmodule.model.actors.type.pwm.Pwm;
 import pl.smarthouse.smartmodule.services.ManagerService;
 import pl.smarthouse.smartmodule.services.ModuleService;
 
@@ -38,7 +39,7 @@ public class ModuleConfig {
   public static final String FAN_OUTLET = "fan_outlet";
   public static final int FAN_OUTLET_CHANNEL = 3;
   public static final int FAN_OUTLET_PIN = 2;
-  // Revs counters
+  // Rev counters
   public static final String FAN_OUTLET_REV_COUNTER = "fan_outlet_rev";
   public static final int FAN_OUTLET_REV_COUNTER_PIN = 15;
   public static final String FAN_INLET_REV_COUNTER = "fan_inlet_rev";
@@ -48,6 +49,10 @@ public class ModuleConfig {
   // Circuit pomp
   public static final String PUMP = "pump";
   public static final int CIRCUIT_PUMP_PIN = 17;
+
+  // Servo driver
+  public static final String THROTTLES = "throttles";
+  public static final int THROTTLES_SERVO_FREQUENCY_HZ = 50;
 
   // Module specific
   private static final String FIRMWARE = "20230107.00";
@@ -74,17 +79,17 @@ public class ModuleConfig {
     final ActorMap actorMap = new ActorMap();
 
     // BME280 sensors
-    actorMap.putActor(new BME280(BME280_INLET, 13));
-    actorMap.putActor(new BME280(BME280_OUTLET, 14));
-    actorMap.putActor(new BME280(BME280_FRESH_AIR, 27));
-    actorMap.putActor(new BME280(BME280_USED_AIR, 26));
+    actorMap.putActor(new Bme280(BME280_INLET, 13));
+    actorMap.putActor(new Bme280(BME280_OUTLET, 14));
+    actorMap.putActor(new Bme280(BME280_FRESH_AIR, 27));
+    actorMap.putActor(new Bme280(BME280_USED_AIR, 26));
 
     // PWM actors
     actorMap.putActor(
-        new PWM(
+        new Pwm(
             FAN_INLET, FAN_INLET_CHANNEL, FAN_FREQUENCY, FAN_RESOLUTION, FAN_INLET_PIN, 0, true));
     actorMap.putActor(
-        new PWM(
+        new Pwm(
             FAN_OUTLET,
             FAN_OUTLET_CHANNEL,
             FAN_FREQUENCY,
@@ -107,6 +112,9 @@ public class ModuleConfig {
 
     // Circuit pump
     actorMap.putActor(new Pin(PUMP, CIRCUIT_PUMP_PIN, PinMode.OUTPUT, PinState.LOW, false));
+
+    // Throttles
+    actorMap.putActor(new Pca9685(THROTTLES, THROTTLES_SERVO_FREQUENCY_HZ));
 
     return actorMap;
   }
