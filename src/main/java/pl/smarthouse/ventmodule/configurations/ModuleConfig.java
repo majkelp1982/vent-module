@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import pl.smarthouse.smartmodule.model.actors.actor.Actor;
 import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280;
+import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685;
 import pl.smarthouse.smartmodule.model.actors.type.pin.Pin;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinMode;
@@ -23,9 +24,13 @@ public class ModuleConfig {
 
   // Temp, humid, pressure sensors
   public static final String BME280_INLET = "bme280_inlet";
+  public static final int BME280_INLET_PIN = 13;
   public static final String BME280_OUTLET = "bme280_outlet";
+  public static final int BME280_OUTLET_PIN = 14;
   public static final String BME280_FRESH_AIR = "bme280_fresh_air";
+  public static final int BME280_FRESH_AIR_PIN = 27;
   public static final String BME280_USED_AIR = "bme280_used_air";
+  public static final int BME280_USED_AIR_PIN = 26;
 
   // Fan PWM controllers
   // Generic
@@ -54,6 +59,10 @@ public class ModuleConfig {
   public static final String THROTTLES = "throttles";
   public static final int THROTTLES_SERVO_FREQUENCY_HZ = 50;
 
+  // Exchanger
+  public static final String EXCHANGER = "exchanger";
+  public static final int EXCHANGER_DS18B20_PIN = 4;
+
   // Module specific
   private static final String FIRMWARE = "20230107.00";
   private static final String VERSION = "20230107.23";
@@ -79,10 +88,10 @@ public class ModuleConfig {
     final ActorMap actorMap = new ActorMap();
 
     // BME280 sensors
-    actorMap.putActor(new Bme280(BME280_INLET, 13));
-    actorMap.putActor(new Bme280(BME280_OUTLET, 14));
-    actorMap.putActor(new Bme280(BME280_FRESH_AIR, 27));
-    actorMap.putActor(new Bme280(BME280_USED_AIR, 26));
+    actorMap.putActor(new Bme280(BME280_INLET, BME280_INLET_PIN));
+    actorMap.putActor(new Bme280(BME280_OUTLET, BME280_OUTLET_PIN));
+    actorMap.putActor(new Bme280(BME280_FRESH_AIR, BME280_FRESH_AIR_PIN));
+    actorMap.putActor(new Bme280(BME280_USED_AIR, BME280_USED_AIR_PIN));
 
     // PWM actors
     actorMap.putActor(
@@ -115,6 +124,9 @@ public class ModuleConfig {
 
     // Throttles
     actorMap.putActor(new Pca9685(THROTTLES, THROTTLES_SERVO_FREQUENCY_HZ));
+
+    // Exchanger
+    actorMap.putActor(new Ds18b20(EXCHANGER, EXCHANGER_DS18B20_PIN));
 
     return actorMap;
   }
