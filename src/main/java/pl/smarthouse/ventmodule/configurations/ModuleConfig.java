@@ -61,11 +61,18 @@ public class ModuleConfig {
 
   // Exchanger
   public static final String EXCHANGER = "exchanger";
-  public static final int EXCHANGER_DS18B20_PIN = 4;
+  public static final int EXCHANGER_DS18B20_PIN = 15;
+  // DS18b20 - 104 - address: 40-12-1-7-51-138-1-132
+  // DS18b20 - 112 - address: 40-2-0-7-141-53-1-8
+  // DS18b20 - 113 - address: 40-2-0-7-75-42-1-126
+  // DS18b20 - 118 - address: 40-255-192-161-96-23-5-84
+  // Read command -
+  // 40-12-1-7-51-138-1-132;40-2-0-7-141-53-1-8;40-2-0-7-75-42-1-126;40-255-192-161-96-23-5-84;
 
   // Module specific
   private static final String FIRMWARE = "20230107.00";
   private static final String VERSION = "20230107.23";
+  // TEST mac: private static final String MAC_ADDRESS = "XX:XX:XX:XX:XX:XX";
   private static final String MAC_ADDRESS = "3C:71:BF:4D:6A:40";
   private static final String MODULE_TYPE = "VENTILATION";
   private final pl.smarthouse.smartmodule.model.configuration.Configuration configuration;
