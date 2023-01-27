@@ -3,10 +3,10 @@ package pl.smarthouse.ventmodule.configurations;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import pl.smarthouse.smartmodule.model.actors.actor.Actor;
 import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20;
+import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20CompFactor;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685;
 import pl.smarthouse.smartmodule.model.actors.type.pin.Pin;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinMode;
@@ -132,12 +132,23 @@ public class ModuleConfig {
     actorMap.putActor(new Pca9685(THROTTLES, THROTTLES_SERVO_FREQUENCY_HZ));
 
     // Exchanger
-    actorMap.putActor(new Ds18b20(EXCHANGER, EXCHANGER_DS18B20_PIN));
-
+    final Ds18b20 ds18b20 = new Ds18b20(EXCHANGER, EXCHANGER_DS18B20_PIN);
+    ds18b20
+        .getDs18b20CompFactorMap()
+        .put(
+            EXCHANGER_WATTER_IN,
+            Ds18b20CompFactor.builder().gradient(0.9550f).intercept(2.1f).build());
+    ds18b20
+        .getDs18b20CompFactorMap()
+        .put(EXCHANGER_WATTER_OUT, Ds18b20CompFactor.builder().gradient(1f).intercept(0f).build());
+    ds18b20
+        .getDs18b20CompFactorMap()
+        .put(EXCHANGER_AIR_IN, Ds18b20CompFactor.builder().gradient(0.97f).intercept(1.6f).build());
+    ds18b20
+        .getDs18b20CompFactorMap()
+        .put(
+            EXCHANGER_AIR_OUT, Ds18b20CompFactor.builder().gradient(1.075f).intercept(-5f).build());
+    actorMap.putActor(ds18b20);
     return actorMap;
-  }
-
-  public Actor getActor(final String name) {
-    return configuration.getActorMap().getActor(name);
   }
 }

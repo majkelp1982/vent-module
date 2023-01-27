@@ -13,6 +13,7 @@ import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Utils;
 import pl.smarthouse.smartmodule.model.enums.ActorType;
 import pl.smarthouse.ventmodule.configurations.ModuleConfig;
 
+import static org.springframework.data.util.Predicates.negate;
 import static pl.smarthouse.ventmodule.configurations.ModuleConfig.*;
 
 @Service
@@ -39,8 +40,8 @@ public class Ds18b20Chain {
 
     return Step.builder()
         .stepDescription("Read values from each sensor type DS18B20")
-        .conditionDescription("Waiting 10 seconds")
-        .condition(PredicateUtils.delaySeconds(10))
+        .conditionDescription("Waiting 5 seconds")
+        .condition(PredicateUtils.delaySeconds(5))
         .action(createActionStep1())
         .build();
   }
@@ -59,7 +60,12 @@ public class Ds18b20Chain {
     return Step.builder()
         .stepDescription("Set DS18B20 commands to NO_ACTION")
         .conditionDescription("Wait until command read successful")
-        .condition(PredicateUtils.isAllActorTypeReadCommandSuccessful(actorMap, ActorType.DS18B20))
+        .condition(
+            PredicateUtils.isAllActorTypeReadCommandSuccessful(actorMap, ActorType.DS18B20)
+                .and(
+                    negate(
+                        PredicateUtils.isErrorOnDs18b20Group(
+                            actorMap.getActor(EXCHANGER).getResponse()))))
         .action(createActionStep2())
         .build();
   }
