@@ -2,8 +2,8 @@ package pl.smarthouse.ventmodule.chain;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.smarthouse.smartchain.model.Chain;
-import pl.smarthouse.smartchain.model.Step;
+import pl.smarthouse.smartchain.model.core.Chain;
+import pl.smarthouse.smartchain.model.core.Step;
 import pl.smarthouse.smartchain.service.ChainService;
 import pl.smarthouse.smartchain.utils.ActionUtils;
 import pl.smarthouse.smartchain.utils.PredicateUtils;
