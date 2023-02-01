@@ -17,4 +17,9 @@ public class ZoneDao {
   @NonNull private FunctionType functionType;
   private Operation operation;
   @NonNull private ThrottleDao throttleDao;
+
+  public void setOperation(final Operation operation) {
+    this.operation = operation;
+    lastUpdate = LocalDateTime.now();
+  }
 }
