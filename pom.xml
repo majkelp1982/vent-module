@@ -52,6 +52,11 @@
 			<artifactId>smart-chain</artifactId>
 			<version>1.0</version>
 		</dependency>
+		<dependency>
+			<groupId>pl.smarthouse</groupId>
+			<artifactId>shared-objects</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

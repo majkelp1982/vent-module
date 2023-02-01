@@ -10,15 +10,16 @@ import pl.smarthouse.smartchain.utils.PredicateUtils;
 import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280CommandType;
 import pl.smarthouse.smartmodule.model.enums.ActorType;
-import pl.smarthouse.ventmodule.configurations.ModuleConfig;
+import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
 
 @Service
 public class Bme280Chain {
   private final ActorMap actorMap;
 
   public Bme280Chain(
-      @Autowired final ChainService chainService, @Autowired final ModuleConfig moduleConfig) {
-    actorMap = moduleConfig.getConfiguration().getActorMap();
+      @Autowired final ChainService chainService,
+      @Autowired final Esp32ModuleConfig esp32ModuleConfig) {
+    actorMap = esp32ModuleConfig.getConfiguration().getActorMap();
     final Chain chain = createChain();
     chainService.addChain(chain);
   }

@@ -19,7 +19,7 @@ import javax.annotation.PostConstruct;
 
 @Configuration
 @Getter
-public class ModuleConfig {
+public class Esp32ModuleConfig {
   // Actors
 
   // Temp, humid, pressure sensors
@@ -78,7 +78,7 @@ public class ModuleConfig {
   @Autowired ModuleService moduleService;
   @Autowired ManagerService managerService;
 
-  public ModuleConfig() {
+  public Esp32ModuleConfig() {
     configuration =
         new pl.smarthouse.smartmodule.model.configuration.Configuration(
             MODULE_TYPE, FIRMWARE, VERSION, MAC_ADDRESS, createActors());

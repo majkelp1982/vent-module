@@ -11,18 +11,19 @@ import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20CommandType;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Utils;
 import pl.smarthouse.smartmodule.model.enums.ActorType;
-import pl.smarthouse.ventmodule.configurations.ModuleConfig;
+import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
 
 import static org.springframework.data.util.Predicates.negate;
-import static pl.smarthouse.ventmodule.configurations.ModuleConfig.*;
+import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.*;
 
 @Service
 public class Ds18b20Chain {
   private final ActorMap actorMap;
 
   public Ds18b20Chain(
-      @Autowired final ChainService chainService, @Autowired final ModuleConfig moduleConfig) {
-    actorMap = moduleConfig.getConfiguration().getActorMap();
+      @Autowired final ChainService chainService,
+      @Autowired final Esp32ModuleConfig esp32ModuleConfig) {
+    actorMap = esp32ModuleConfig.getConfiguration().getActorMap();
     final Chain chain = createChain();
     chainService.addChain(chain);
   }

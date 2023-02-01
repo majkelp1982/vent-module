@@ -3,9 +3,12 @@ package pl.smarthouse.ventmodule.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.enums.Operation;
+import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
@@ -19,24 +22,36 @@ public class ZoneService {
 
   private final VentModuleConfiguration ventModuleConfiguration;
 
+  public void setZoneOperation(final ZoneName zoneName, final Operation operation) {
+    final ZoneDao zoneDao = ventModuleConfiguration.getZoneDaoHashMap().get(zoneName);
+  }
+
   public Flux<ZoneDao> checkIfZonesOutdated() {
-    return Flux.fromIterable(ventModuleConfiguration.getZoneDaoList())
-        .doOnNext(
-            zoneDao -> {
+    return Flux.fromIterable(ventModuleConfiguration.getZoneDaoHashMap().keySet())
+        .flatMap(
+            zoneName -> {
               if (LocalDateTime.now()
-                  .isAfter(zoneDao.getLastUpdate().plusMinutes(ZONE_OUTDATED_IN_MINUTES))) {
-                log.info(LOG_RESET_ZONE, zoneDao.getName(), ZONE_OUTDATED_IN_MINUTES);
-                resetZone(zoneDao);
+                  .isAfter(
+                      ventModuleConfiguration
+                          .getZoneDaoHashMap()
+                          .get(zoneName)
+                          .getLastUpdate()
+                          .plusMinutes(ZONE_OUTDATED_IN_MINUTES))) {
+                log.info(LOG_RESET_ZONE, zoneName, ZONE_OUTDATED_IN_MINUTES);
+                return resetZone(ventModuleConfiguration.getZoneDaoHashMap().get(zoneName));
               }
+              return Mono.empty();
             });
   }
 
-  private void resetZone(final ZoneDao zoneDao) {
-    zoneDao.getCurrentState().setAirExchange(false);
-    zoneDao.getCurrentState().setActiveCooling(false);
-    zoneDao.getCurrentState().setActiveHeating(false);
-    zoneDao.getCurrentState().setHumidityAlert(false);
-    zoneDao.getThrottleDao().setGoalPosition(zoneDao.getThrottleDao().getClosePosition());
-    zoneDao.setLastUpdate(LocalDateTime.now());
+  private Mono<ZoneDao> resetZone(final ZoneDao zoneDao) {
+    return Mono.just(zoneDao)
+        .map(
+            zone -> {
+              zone.setOperation(Operation.STANDBY);
+              zone.getThrottleDao().setGoalPosition(zone.getThrottleDao().getClosePosition());
+              zone.setLastUpdate(LocalDateTime.now());
+              return zone;
+            });
   }
 }
