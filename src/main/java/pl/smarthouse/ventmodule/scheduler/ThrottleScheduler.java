@@ -9,12 +9,12 @@ import pl.smarthouse.ventmodule.service.ZoneService;
 @EnableScheduling
 @RequiredArgsConstructor
 @Service
-public class ZoneOutdatedScheduler {
+public class ThrottleScheduler {
 
   private final ZoneService zoneService;
 
   @Scheduled(initialDelay = 10000, fixedDelay = 1000)
   public void zoneOutdatedScheduler() {
-    zoneService.checkIfZonesOutdated().subscribe();
+    zoneService.setThrottles().subscribe();
   }
 }

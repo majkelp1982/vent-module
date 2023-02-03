@@ -37,8 +37,8 @@ public class Bme280Chain {
 
     return Step.builder()
         .stepDescription("Read values from each sensor type BME280")
-        .conditionDescription("Waiting 10 seconds")
-        .condition(PredicateUtils.delaySeconds(10))
+        .conditionDescription("Waiting 30 seconds")
+        .condition(PredicateUtils.delaySeconds(30))
         .action(createActionStep1())
         .build();
   }

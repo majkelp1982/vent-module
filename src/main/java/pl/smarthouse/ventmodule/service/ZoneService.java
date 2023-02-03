@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
+import pl.smarthouse.ventmodule.model.dao.ThrottleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.model.dto.ZoneDto;
 import reactor.core.publisher.Flux;
@@ -55,10 +56,25 @@ public class ZoneService {
                           .get(zoneName)
                           .getLastUpdate()
                           .plusMinutes(ZONE_OUTDATED_IN_MINUTES))) {
-                log.info(LOG_RESET_ZONE, zoneName, ZONE_OUTDATED_IN_MINUTES);
+                log.warn(LOG_RESET_ZONE, zoneName, ZONE_OUTDATED_IN_MINUTES);
                 return resetZone(ventModuleConfiguration.getZoneDaoHashMap().get(zoneName));
               }
               return Mono.empty();
+            });
+  }
+
+  public Flux<ZoneDao> setThrottles() {
+    return getAllZones()
+        .map(
+            tuple2 -> {
+              final ZoneDao zoneDao = tuple2.getT2();
+              final ThrottleDao throttleDao = zoneDao.getThrottleDao();
+              if (Operation.STANDBY.equals(zoneDao.getOperation())) {
+                throttleDao.setGoalPosition(throttleDao.getClosePosition());
+              } else {
+                throttleDao.setGoalPosition(throttleDao.getOpenPosition());
+              }
+              return zoneDao;
             });
   }
 
@@ -67,7 +83,6 @@ public class ZoneService {
         .map(
             zone -> {
               zone.setOperation(Operation.STANDBY);
-              zone.getThrottleDao().setGoalPosition(zone.getThrottleDao().getClosePosition());
               zone.setLastUpdate(LocalDateTime.now());
               return zone;
             });

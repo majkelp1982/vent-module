@@ -41,8 +41,8 @@ public class Ds18b20Chain {
 
     return Step.builder()
         .stepDescription("Read values from each sensor type DS18B20")
-        .conditionDescription("Waiting 5 seconds")
-        .condition(PredicateUtils.delaySeconds(5))
+        .conditionDescription("Waiting 30 seconds")
+        .condition(PredicateUtils.delaySeconds(30))
         .action(createActionStep1())
         .build();
   }
