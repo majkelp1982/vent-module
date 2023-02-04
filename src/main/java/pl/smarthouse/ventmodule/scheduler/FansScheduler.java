@@ -4,17 +4,17 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import pl.smarthouse.ventmodule.service.ThrottlesService;
+import pl.smarthouse.ventmodule.service.FansService;
 
 @EnableScheduling
 @RequiredArgsConstructor
 @Service
-public class ThrottleScheduler {
+public class FansScheduler {
 
-  private final ThrottlesService throttlesService;
+  private final FansService fansService;
 
   @Scheduled(initialDelay = 10000, fixedDelay = 1000)
-  public void setThrottlesScheduler() {
-    throttlesService.setThrottles().subscribe();
+  public void setRequiredFansPower() {
+    fansService.setFansRequiredPower().subscribe();
   }
 }

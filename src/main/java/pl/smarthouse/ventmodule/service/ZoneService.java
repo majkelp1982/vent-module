@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
-import pl.smarthouse.ventmodule.model.dao.ThrottleDao;
+import pl.smarthouse.ventmodule.exceptions.InvalidZoneOperationException;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.model.dto.ZoneDto;
 import reactor.core.publisher.Flux;
@@ -23,6 +23,8 @@ import java.time.LocalDateTime;
 public class ZoneService {
   private static final String LOG_RESET_ZONE =
       "Zone: {}, will be reset due to last update is over: {} minutes ago";
+  private static final String ERROR_POWER_REQUIRED =
+      "Zone name: %s, operation: %s need requiresPower parameter bigger than 0";
   private final int ZONE_OUTDATED_IN_MINUTES = 2;
 
   private final VentModuleConfiguration ventModuleConfiguration;
@@ -35,11 +37,21 @@ public class ZoneService {
                 Tuples.of(zoneName, ventModuleConfiguration.getZoneDaoHashMap().get(zoneName)));
   }
 
-  public Mono<ZoneDto> setZoneOperation(final ZoneName zoneName, final Operation operation) {
+  public Mono<ZoneDto> setZoneOperation(
+      final ZoneName zoneName, final Operation operation, final int requiredPower) {
     return Mono.justOrEmpty(ventModuleConfiguration.getZoneDaoHashMap().get(zoneName))
         .map(
             zoneDao -> {
               zoneDao.setOperation(operation);
+              if (!Operation.STANDBY.equals(operation)) {
+                if (requiredPower == 0) {
+                  throw new InvalidZoneOperationException(
+                      String.format(ERROR_POWER_REQUIRED, zoneName, operation));
+                }
+                zoneDao.setRequiredPower(requiredPower);
+              } else {
+                zoneDao.setRequiredPower(0);
+              }
               return zoneDao;
             })
         .map(zoneDao -> modelMapper.map(zoneDao, ZoneDto.class));
@@ -60,21 +72,6 @@ public class ZoneService {
                 return resetZone(ventModuleConfiguration.getZoneDaoHashMap().get(zoneName));
               }
               return Mono.empty();
-            });
-  }
-
-  public Flux<ZoneDao> setThrottles() {
-    return getAllZones()
-        .map(
-            tuple2 -> {
-              final ZoneDao zoneDao = tuple2.getT2();
-              final ThrottleDao throttleDao = zoneDao.getThrottleDao();
-              if (Operation.STANDBY.equals(zoneDao.getOperation())) {
-                throttleDao.setGoalPosition(throttleDao.getClosePosition());
-              } else {
-                throttleDao.setGoalPosition(throttleDao.getOpenPosition());
-              }
-              return zoneDao;
             });
   }
 

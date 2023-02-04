@@ -16,7 +16,9 @@ public class ZonesController {
 
   @PostMapping(value = "/{zoneName}/operation")
   public Mono<ZoneDto> setZoneOperation(
-      @PathVariable final ZoneName zoneName, @RequestParam final Operation operation) {
-    return zoneService.setZoneOperation(zoneName, operation);
+      @PathVariable final ZoneName zoneName,
+      @RequestParam final Operation operation,
+      @RequestParam(required = false) final int requiredPower) {
+    return zoneService.setZoneOperation(zoneName, operation, requiredPower);
   }
 }
