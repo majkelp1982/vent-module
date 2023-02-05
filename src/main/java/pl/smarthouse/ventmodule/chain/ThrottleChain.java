@@ -10,10 +10,12 @@ import pl.smarthouse.smartchain.utils.PredicateUtils;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
-import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
-import pl.smarthouse.ventmodule.model.dao.ThrottleDao;
+import pl.smarthouse.ventmodule.model.core.Throttle;
+import pl.smarthouse.ventmodule.model.dao.ZoneDao;
+import pl.smarthouse.ventmodule.service.VentModuleService;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.THROTTLES;
@@ -22,18 +24,18 @@ import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.THROTTLE
 @Slf4j
 public class ThrottleChain {
 
-  private final VentModuleConfiguration ventModuleConfiguration;
+  private final VentModuleService ventModuleService;
   private final Pca9685 throttleActor;
-  private ThrottleDao throttleDao;
+  private Throttle throttle;
 
   public ThrottleChain(
       @Autowired final ChainService chainService,
       @Autowired final Esp32ModuleConfig esp32ModuleConfig,
-      @Autowired final VentModuleConfiguration ventModuleConfiguration) {
+      @Autowired final VentModuleService ventModuleService) {
     this.throttleActor =
         (Pca9685) esp32ModuleConfig.getConfiguration().getActorMap().getActor(THROTTLES);
-    this.ventModuleConfiguration = ventModuleConfiguration;
     chainService.addChain(createChain());
+    this.ventModuleService = ventModuleService;
   }
 
   private Chain createChain() {
@@ -60,27 +62,25 @@ public class ThrottleChain {
 
   private Predicate<Step> findThrottleToDrive() {
     return step -> {
-      final Optional<ThrottleDao> throttleDao =
-          ventModuleConfiguration.getZoneDaoHashMap().keySet().stream()
-              .map(
-                  zoneName ->
-                      ventModuleConfiguration.getZoneDaoHashMap().get(zoneName).getThrottleDao())
-              .filter(throttle -> (throttle.getCurrentPosition() != throttle.getGoalPosition()))
-              .findFirst();
-      if (throttleDao.isPresent()) {
-        this.throttleDao = throttleDao.get();
-        return true;
-      } else {
-        this.throttleDao = null;
-        return false;
-      }
+      this.throttle = null;
+      ventModuleService
+          .getAllZones()
+          .map(ZoneDao::getThrottle)
+          .filter(throttle -> (throttle.getCurrentPosition() != throttle.getGoalPosition()))
+          .flatMap(
+              throttle -> {
+                this.throttle = throttle;
+                return Mono.empty();
+              })
+          .blockLast();
+      return !Objects.isNull(throttle);
     };
   }
 
   private Runnable driveThrottleToGoalPosition() {
     return () -> {
-      throttleActor.getCommandSet().setCommandType(throttleDao.getCommandType());
-      throttleActor.getCommandSet().setValue(Integer.toString(throttleDao.getGoalPosition()));
+      throttleActor.getCommandSet().setCommandType(throttle.getCommandType());
+      throttleActor.getCommandSet().setValue(Integer.toString(throttle.getGoalPosition()));
     };
   }
 
@@ -99,8 +99,8 @@ public class ThrottleChain {
 
   private Predicate<Step> isResponseContainStepMotorIndex() {
     return step ->
-        throttleDao.getCommandType().toString().contains(throttleActor.getResponse().getChannel())
-            && (throttleDao.getGoalPosition() == throttleActor.getResponse().getMicroseconds());
+        throttle.getCommandType().toString().contains(throttleActor.getResponse().getChannel())
+            && (throttle.getGoalPosition() == throttleActor.getResponse().getMicroseconds());
   }
 
   private Step wait1SecondAndReleaseServoMotor() {
@@ -114,7 +114,7 @@ public class ThrottleChain {
 
   private Runnable writeCurrentPositionAndReleaseAllServoMotors() {
     return () -> {
-      throttleDao.setCurrentPosition(throttleDao.getGoalPosition());
+      throttle.setCurrentPosition(throttle.getGoalPosition());
       throttleActor.getCommandSet().setCommandType(Pca9685CommandType.WRITE_ALL_MICROSECONDS);
       throttleActor.getCommandSet().setValue(Integer.toString(0));
     };
@@ -135,8 +135,6 @@ public class ThrottleChain {
   }
 
   private Runnable setNoAction() {
-    return () -> {
-      throttleActor.getCommandSet().setCommandType(Pca9685CommandType.NO_ACTION);
-    };
+    return () -> throttleActor.getCommandSet().setCommandType(Pca9685CommandType.NO_ACTION);
   }
 }

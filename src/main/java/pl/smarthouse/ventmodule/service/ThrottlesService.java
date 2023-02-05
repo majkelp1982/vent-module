@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.enums.Operation;
-import pl.smarthouse.ventmodule.model.dao.ThrottleDao;
+import pl.smarthouse.ventmodule.model.core.Throttle;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import reactor.core.publisher.Flux;
 
@@ -12,19 +12,18 @@ import reactor.core.publisher.Flux;
 @RequiredArgsConstructor
 @Slf4j
 public class ThrottlesService {
-  private final ZoneService zoneService;
+  private final VentModuleService ventModuleService;
 
   public Flux<ZoneDao> setThrottles() {
-    return zoneService
+    return ventModuleService
         .getAllZones()
         .map(
-            tuple2 -> {
-              final ZoneDao zoneDao = tuple2.getT2();
-              final ThrottleDao throttleDao = zoneDao.getThrottleDao();
+            zoneDao -> {
+              final Throttle throttle = zoneDao.getThrottle();
               if (Operation.STANDBY.equals(zoneDao.getOperation())) {
-                throttleDao.setGoalPosition(throttleDao.getClosePosition());
+                throttle.setGoalPosition(throttle.getClosePosition());
               } else {
-                throttleDao.setGoalPosition(throttleDao.getOpenPosition());
+                throttle.setGoalPosition(throttle.getOpenPosition());
               }
               return zoneDao;
             });

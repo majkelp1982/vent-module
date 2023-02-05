@@ -6,6 +6,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.ventmodule.enums.FunctionType;
+import pl.smarthouse.ventmodule.model.core.Throttle;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +17,7 @@ public class ZoneDao {
   @NonNull private LocalDateTime lastUpdate;
   @NonNull private FunctionType functionType;
   private Operation operation;
-  @NonNull private ThrottleDao throttleDao;
+  @NonNull private Throttle throttle;
   private int requiredPower;
 
   public void setOperation(final Operation operation) {

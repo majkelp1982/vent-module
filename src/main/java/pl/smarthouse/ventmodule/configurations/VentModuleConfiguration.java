@@ -6,7 +6,10 @@ import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType;
 import pl.smarthouse.ventmodule.enums.FunctionType;
-import pl.smarthouse.ventmodule.model.dao.ThrottleDao;
+import pl.smarthouse.ventmodule.model.core.Fan;
+import pl.smarthouse.ventmodule.model.core.Fans;
+import pl.smarthouse.ventmodule.model.core.Throttle;
+import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 
 import java.time.LocalDateTime;
@@ -23,10 +26,10 @@ public class VentModuleConfiguration {
   public static final int THROTTLE_INTAKE_OPEN_POSITION = 0;
   public static final int THROTTLE_INTAKE_CLOSE_POSITION = 0;
 
-  private final HashMap<ZoneName, ZoneDao> zoneDaoHashMap = new HashMap<>();
+  private final VentModuleDao ventModuleDao;
 
-  private final ThrottleDao airIntake =
-      ThrottleDao.builder()
+  private final Throttle airIntake =
+      Throttle.builder()
           .openPosition(THROTTLE_INTAKE_OPEN_POSITION)
           .closePosition(THROTTLE_INTAKE_CLOSE_POSITION)
           .goalPosition(THROTTLE_INTAKE_CLOSE_POSITION)
@@ -35,10 +38,19 @@ public class VentModuleConfiguration {
           .build();
 
   public VentModuleConfiguration() {
-    addZones();
+    ventModuleDao =
+        VentModuleDao.builder()
+            .zoneDaoHashMap(createZones())
+            .fans(
+                Fans.builder()
+                    .inlet(Fan.builder().currentSpeed(1).goalSpeed(0).build())
+                    .outlet(Fan.builder().currentSpeed(1).goalSpeed(0).build())
+                    .build())
+            .build();
   }
 
-  private void addZones() {
+  private HashMap<ZoneName, ZoneDao> createZones() {
+    final HashMap<ZoneName, ZoneDao> zoneDaoHashMap = new HashMap<>();
     zoneDaoHashMap.put(
         SALON,
         createZone(
@@ -123,6 +135,7 @@ public class VentModuleConfiguration {
             KAROLINA_OPEN_POSITION,
             KAROLINA_CLOSE_POSITION,
             WRITE_SERVO12_MICROSECONDS));
+    return zoneDaoHashMap;
   }
 
   private ZoneDao createZone(
@@ -133,8 +146,8 @@ public class VentModuleConfiguration {
     return ZoneDao.builder()
         .functionType(functionType)
         .operation(Operation.STANDBY)
-        .throttleDao(
-            ThrottleDao.builder()
+        .throttle(
+            Throttle.builder()
                 .openPosition(openPosition)
                 .closePosition(closePosition)
                 .currentPosition(0)
