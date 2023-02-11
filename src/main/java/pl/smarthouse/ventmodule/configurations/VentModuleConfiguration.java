@@ -22,17 +22,13 @@ import static pl.smarthouse.ventmodule.properties.ThrottleProperties.*;
 @Configuration
 @Getter
 public class VentModuleConfiguration {
-  // INTAKE THROTTLE
-  public static final int THROTTLE_INTAKE_OPEN_POSITION = 0;
-  public static final int THROTTLE_INTAKE_CLOSE_POSITION = 0;
-
   private final VentModuleDao ventModuleDao;
 
   private final Throttle airIntake =
       Throttle.builder()
-          .openPosition(THROTTLE_INTAKE_OPEN_POSITION)
-          .closePosition(THROTTLE_INTAKE_CLOSE_POSITION)
-          .goalPosition(THROTTLE_INTAKE_CLOSE_POSITION)
+          .openPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)
+          .closePosition(THROTTLE_INTAKE_INTERNAL_SOURCE)
+          .goalPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)
           .currentPosition(0)
           .commandType(WRITE_SERVO0_MICROSECONDS)
           .build();

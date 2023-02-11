@@ -70,9 +70,16 @@ public class ThrottleChain {
           .flatMap(
               throttle -> {
                 this.throttle = throttle;
-                return Mono.empty();
+                return Mono.just(throttle);
               })
-          .blockLast();
+          .switchIfEmpty(Mono.defer(ventModuleService::getIntakeThrottle))
+          .filter(throttle -> (throttle.getCurrentPosition() != throttle.getGoalPosition()))
+          .flatMap(
+              throttle -> {
+                this.throttle = throttle;
+                return Mono.just(throttle);
+              })
+          .subscribe();
       return !Objects.isNull(throttle);
     };
   }

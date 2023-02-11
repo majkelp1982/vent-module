@@ -16,4 +16,6 @@ public class Fan {
   @Min(value = 0)
   @Max(value = 100)
   private int goalSpeed;
+
+  private int revolution;
 }

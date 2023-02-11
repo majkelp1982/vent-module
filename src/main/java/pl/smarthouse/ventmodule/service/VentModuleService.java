@@ -2,12 +2,15 @@ package pl.smarthouse.ventmodule.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
 import pl.smarthouse.ventmodule.model.core.Fan;
 import pl.smarthouse.ventmodule.model.core.Fans;
+import pl.smarthouse.ventmodule.model.core.Throttle;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
+import pl.smarthouse.ventmodule.model.dto.VentModuleDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
@@ -18,6 +21,12 @@ import reactor.util.function.Tuples;
 @Slf4j
 public class VentModuleService {
   private final VentModuleConfiguration ventModuleConfiguration;
+  private final ModelMapper modelMapper = new ModelMapper();
+
+  public Mono<VentModuleDto> getVentModule() {
+    return Mono.just(
+        modelMapper.map(ventModuleConfiguration.getVentModuleDao(), VentModuleDto.class));
+  }
 
   public Mono<ZoneDao> getZone(final ZoneName zoneName) {
     return Mono.justOrEmpty(
@@ -30,6 +39,10 @@ public class VentModuleService {
         .map(
             zoneName ->
                 ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().get(zoneName));
+  }
+
+  public Mono<Throttle> getIntakeThrottle() {
+    return Mono.just(ventModuleConfiguration.getAirIntake());
   }
 
   public Flux<Tuple2<ZoneName, ZoneDao>> getAllZonesWithZoneNames() {

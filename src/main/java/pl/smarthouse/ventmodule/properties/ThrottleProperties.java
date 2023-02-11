@@ -1,6 +1,11 @@
 package pl.smarthouse.ventmodule.properties;
 
 public class ThrottleProperties {
+  // INTAKE THROTTLE
+  public static final int THROTTLE_INTAKE_INTERNAL_SOURCE = 960;
+  public static final int THROTTLE_INTAKE_EXTERNAL_SOURCE = 1960;
+
+  // Zone throttles
   public static final int SALON_OPEN_POSITION = 960;
   public static final int SALON_CLOSE_POSITION = 1960;
   public static final int KUCHNIA_OPEN_POSITION = 960;
