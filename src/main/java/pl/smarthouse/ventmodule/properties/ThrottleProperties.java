@@ -1,6 +1,10 @@
 package pl.smarthouse.ventmodule.properties;
 
 public class ThrottleProperties {
+  // Servo driver
+  public static final String THROTTLES = "throttles";
+  public static final int THROTTLES_SERVO_FREQUENCY_HZ = 50;
+
   // INTAKE THROTTLE
   public static final int THROTTLE_INTAKE_INTERNAL_SOURCE = 960;
   public static final int THROTTLE_INTAKE_EXTERNAL_SOURCE = 1960;

@@ -9,16 +9,23 @@ import pl.smarthouse.smartchain.utils.ActionUtils;
 import pl.smarthouse.smartchain.utils.PredicateUtils;
 import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280CommandType;
+import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280Response;
 import pl.smarthouse.smartmodule.model.enums.ActorType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
+import pl.smarthouse.ventmodule.service.VentModuleService;
+
+import static pl.smarthouse.ventmodule.properties.AirExchangerProperties.*;
 
 @Service
 public class Bme280Chain {
   private final ActorMap actorMap;
+  private final VentModuleService ventModuleService;
 
   public Bme280Chain(
+      @Autowired final VentModuleService ventModuleService,
       @Autowired final ChainService chainService,
       @Autowired final Esp32ModuleConfig esp32ModuleConfig) {
+    this.ventModuleService = ventModuleService;
     actorMap = esp32ModuleConfig.getConfiguration().getActorMap();
     final Chain chain = createChain();
     chainService.addChain(chain);
@@ -58,8 +65,28 @@ public class Bme280Chain {
   }
 
   private Runnable createActionStep2() {
-    return () ->
-        ActionUtils.setActionToAllActorType(
-            actorMap, ActorType.BME280, Bme280CommandType.NO_ACTION);
+    return () -> {
+      ventModuleService
+          .getVentModuleDao()
+          .map(
+              ventModuleDao -> {
+                ventModuleDao
+                    .getAirExchanger()
+                    .setInlet((Bme280Response) actorMap.getActor(BME280_INLET).getResponse());
+                ventModuleDao
+                    .getAirExchanger()
+                    .setOutlet((Bme280Response) actorMap.getActor(BME280_OUTLET).getResponse());
+                ventModuleDao
+                    .getAirExchanger()
+                    .setFreshAir(
+                        (Bme280Response) actorMap.getActor(BME280_FRESH_AIR).getResponse());
+                ventModuleDao
+                    .getAirExchanger()
+                    .setUserAir((Bme280Response) actorMap.getActor(BME280_USED_AIR).getResponse());
+                return ventModuleDao;
+              })
+          .subscribe();
+      ActionUtils.setActionToAllActorType(actorMap, ActorType.BME280, Bme280CommandType.NO_ACTION);
+    };
   }
 }

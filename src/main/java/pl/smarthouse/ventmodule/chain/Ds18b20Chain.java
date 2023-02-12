@@ -5,25 +5,27 @@ import org.springframework.stereotype.Service;
 import pl.smarthouse.smartchain.model.core.Chain;
 import pl.smarthouse.smartchain.model.core.Step;
 import pl.smarthouse.smartchain.service.ChainService;
-import pl.smarthouse.smartchain.utils.ActionUtils;
 import pl.smarthouse.smartchain.utils.PredicateUtils;
-import pl.smarthouse.smartmodule.model.actors.actor.ActorMap;
+import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20CommandType;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Utils;
-import pl.smarthouse.smartmodule.model.enums.ActorType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
+import pl.smarthouse.ventmodule.service.VentModuleService;
 
 import static org.springframework.data.util.Predicates.negate;
-import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.*;
+import static pl.smarthouse.ventmodule.properties.ActiveHeatingCoolingExchangerProperties.*;
 
 @Service
 public class Ds18b20Chain {
-  private final ActorMap actorMap;
+  private final VentModuleService ventModuleService;
+  private final Ds18b20 airExchanger;
 
   public Ds18b20Chain(
+      @Autowired final VentModuleService ventModuleService,
       @Autowired final ChainService chainService,
       @Autowired final Esp32ModuleConfig esp32ModuleConfig) {
-    actorMap = esp32ModuleConfig.getConfiguration().getActorMap();
+    this.ventModuleService = ventModuleService;
+    airExchanger = (Ds18b20) esp32ModuleConfig.getConfiguration().getActorMap().getActor(EXCHANGER);
     final Chain chain = createChain();
     chainService.addChain(chain);
   }
@@ -48,13 +50,14 @@ public class Ds18b20Chain {
   }
 
   private Runnable createActionStep1() {
-    return () ->
-        ActionUtils.setActionToAllActorType(
-            actorMap,
-            ActorType.DS18B20,
-            Ds18b20CommandType.READ,
-            Ds18b20Utils.getDs18b20Command(
-                EXCHANGER_WATTER_IN, EXCHANGER_WATTER_OUT, EXCHANGER_AIR_IN, EXCHANGER_AIR_OUT));
+    return () -> {
+      airExchanger.getCommandSet().setCommandType(Ds18b20CommandType.READ);
+      airExchanger
+          .getCommandSet()
+          .setValue(
+              Ds18b20Utils.getDs18b20Command(
+                  EXCHANGER_WATTER_IN, EXCHANGER_WATTER_OUT, EXCHANGER_AIR_IN, EXCHANGER_AIR_OUT));
+    };
   }
 
   private Step createStep2() {
@@ -62,18 +65,35 @@ public class Ds18b20Chain {
         .stepDescription("Set DS18B20 commands to NO_ACTION")
         .conditionDescription("Wait until command read successful")
         .condition(
-            PredicateUtils.isAllActorTypeReadCommandSuccessful(actorMap, ActorType.DS18B20)
-                .and(
-                    negate(
-                        PredicateUtils.isErrorOnDs18b20Group(
-                            actorMap.getActor(EXCHANGER).getResponse()))))
+            PredicateUtils.isResponseUpdated(airExchanger)
+                .and(negate(PredicateUtils.isErrorOnDs18b20Group(airExchanger.getResponse()))))
         .action(createActionStep2())
         .build();
   }
 
   private Runnable createActionStep2() {
-    return () ->
-        ActionUtils.setActionToAllActorType(
-            actorMap, ActorType.DS18B20, Ds18b20CommandType.NO_ACTION);
+    return () -> {
+      ventModuleService
+          .getVentModuleDao()
+          .map(
+              ventModuleDao -> {
+                ventModuleDao
+                    .getActiveHeatingCoolingExchanger()
+                    .setWatterIn(airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_IN));
+                ventModuleDao
+                    .getActiveHeatingCoolingExchanger()
+                    .setWatterOut(airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_OUT));
+                ventModuleDao
+                    .getActiveHeatingCoolingExchanger()
+                    .setAirIn(airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_IN));
+                ventModuleDao
+                    .getActiveHeatingCoolingExchanger()
+                    .setAirOut(airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_OUT));
+                return ventModuleDao;
+              })
+          .subscribe();
+
+      airExchanger.getCommandSet().setCommandType(Ds18b20CommandType.NO_ACTION);
+    };
   }
 }

@@ -9,6 +9,7 @@ import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
 import pl.smarthouse.ventmodule.model.core.Fan;
 import pl.smarthouse.ventmodule.model.core.Fans;
 import pl.smarthouse.ventmodule.model.core.Throttle;
+import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.model.dto.VentModuleDto;
 import reactor.core.publisher.Flux;
@@ -28,6 +29,10 @@ public class VentModuleService {
         modelMapper.map(ventModuleConfiguration.getVentModuleDao(), VentModuleDto.class));
   }
 
+  public Mono<VentModuleDao> getVentModuleDao() {
+    return Mono.just(ventModuleConfiguration.getVentModuleDao());
+  }
+
   public Mono<ZoneDao> getZone(final ZoneName zoneName) {
     return Mono.justOrEmpty(
         ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().get(zoneName));
@@ -42,7 +47,7 @@ public class VentModuleService {
   }
 
   public Mono<Throttle> getIntakeThrottle() {
-    return Mono.just(ventModuleConfiguration.getAirIntake());
+    return Mono.just(ventModuleConfiguration.getVentModuleDao().getIntakeThrottle());
   }
 
   public Flux<Tuple2<ZoneName, ZoneDao>> getAllZonesWithZoneNames() {

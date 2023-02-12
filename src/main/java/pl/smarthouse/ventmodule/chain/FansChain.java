@@ -17,8 +17,8 @@ import reactor.core.publisher.Mono;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 
-import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.FAN_INLET;
-import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.FAN_OUTLET;
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_INLET;
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_OUTLET;
 
 @Service
 @Slf4j

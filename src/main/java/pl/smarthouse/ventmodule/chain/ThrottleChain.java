@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.THROTTLES;
+import static pl.smarthouse.ventmodule.properties.ThrottleProperties.THROTTLES;
 
 @Service
 @Slf4j

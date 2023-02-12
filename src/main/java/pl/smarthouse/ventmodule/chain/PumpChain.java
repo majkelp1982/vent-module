@@ -13,13 +13,14 @@ import pl.smarthouse.smartmodule.model.actors.type.pin.PinCommandType;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinState;
 import pl.smarthouse.smartmodule.model.actors.type.pwm.PwmCommandType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
+import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
-import static pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig.PUMP;
+import static pl.smarthouse.ventmodule.properties.PumpProperties.PUMP;
 
 @Service
 @Slf4j
@@ -62,7 +63,7 @@ public class PumpChain {
       goalState = PinState.LOW;
       ventModuleService
           .getAllZones()
-          .map(zoneDao -> zoneDao.getOperation())
+          .map(ZoneDao::getOperation)
           .filter(
               operation ->
                   (Operation.HEATING.equals(operation) || Operation.COOLING.equals(operation)))
@@ -111,6 +112,14 @@ public class PumpChain {
 
   private Runnable setNoAction() {
     return () -> {
+      ventModuleService
+          .getVentModuleDao()
+          .map(
+              ventModuleDao -> {
+                ventModuleDao.setCircuitPump(pump.getResponse());
+                return ventModuleDao;
+              })
+          .subscribe();
       pump.getCommandSet().setCommandType(PwmCommandType.NO_ACTION);
     };
   }

@@ -6,9 +6,7 @@ import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType;
 import pl.smarthouse.ventmodule.enums.FunctionType;
-import pl.smarthouse.ventmodule.model.core.Fan;
-import pl.smarthouse.ventmodule.model.core.Fans;
-import pl.smarthouse.ventmodule.model.core.Throttle;
+import pl.smarthouse.ventmodule.model.core.*;
 import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 
@@ -24,15 +22,6 @@ import static pl.smarthouse.ventmodule.properties.ThrottleProperties.*;
 public class VentModuleConfiguration {
   private final VentModuleDao ventModuleDao;
 
-  private final Throttle airIntake =
-      Throttle.builder()
-          .openPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)
-          .closePosition(THROTTLE_INTAKE_INTERNAL_SOURCE)
-          .goalPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)
-          .currentPosition(0)
-          .commandType(WRITE_SERVO0_MICROSECONDS)
-          .build();
-
   public VentModuleConfiguration() {
     ventModuleDao =
         VentModuleDao.builder()
@@ -41,6 +30,16 @@ public class VentModuleConfiguration {
                 Fans.builder()
                     .inlet(Fan.builder().currentSpeed(1).goalSpeed(0).build())
                     .outlet(Fan.builder().currentSpeed(1).goalSpeed(0).build())
+                    .build())
+            .airExchanger(AirExchanger.builder().build())
+            .activeHeatingCoolingExchanger(ActiveHeatingCoolingExchanger.builder().build())
+            .intakeThrottle(
+                Throttle.builder()
+                    .openPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)
+                    .closePosition(THROTTLE_INTAKE_INTERNAL_SOURCE)
+                    .goalPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)
+                    .currentPosition(0)
+                    .commandType(WRITE_SERVO0_MICROSECONDS)
                     .build())
             .build();
   }
