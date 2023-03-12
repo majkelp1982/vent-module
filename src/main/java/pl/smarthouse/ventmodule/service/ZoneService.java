@@ -1,5 +1,7 @@
 package pl.smarthouse.ventmodule.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -12,9 +14,6 @@ import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.model.dto.ZoneDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +79,11 @@ public class ZoneService {
     }
     if (FunctionType.OUTLET.equals(zoneDao.getFunctionType())) {
       final List<Operation> allowedOperationList =
-          List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_EXCHANGE);
+          List.of(
+              Operation.COOLING,
+              Operation.HEATING,
+              Operation.AIR_CONDITION,
+              Operation.AIR_EXCHANGE);
       if (!allowedOperationList.contains(operation)) {
         throw new InvalidZoneOperationException(
             String.format(

@@ -19,10 +19,11 @@ import pl.smarthouse.ventmodule.model.core.Throttle;
 @Getter
 @JsonPropertyOrder({
   "fans",
+  "circuitPump",
+  "airCondition",
+  "intakeThrottle",
   "airExchanger",
   "forcedAirSystemExchanger",
-  "circuitPump",
-  "intakeThrottle",
   "zoneDaoHashMap"
 })
 public class VentModuleDto {

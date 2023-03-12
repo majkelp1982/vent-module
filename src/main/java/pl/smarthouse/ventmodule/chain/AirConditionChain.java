@@ -1,6 +1,6 @@
 package pl.smarthouse.ventmodule.chain;
 
-import static pl.smarthouse.ventmodule.properties.PumpProperties.PUMP;
+import static pl.smarthouse.ventmodule.properties.AirConditionProperties.AIR_CONDITION;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,24 +24,25 @@ import pl.smarthouse.ventmodule.service.VentModuleService;
 
 @Service
 @Slf4j
-public class PumpChain {
+public class AirConditionChain {
 
   private final VentModuleService ventModuleService;
-  private final Pin pump;
+  private final Pin airCondition;
   private PinState goalState;
 
-  public PumpChain(
+  public AirConditionChain(
       @Autowired final ChainService chainService,
       @Autowired final Esp32ModuleConfig esp32ModuleConfig,
       @Autowired final VentModuleService ventModuleService) {
-    this.pump = (Pin) esp32ModuleConfig.getConfiguration().getActorMap().getActor(PUMP);
+    this.airCondition =
+        (Pin) esp32ModuleConfig.getConfiguration().getActorMap().getActor(AIR_CONDITION);
     chainService.addChain(createChain());
     this.ventModuleService = ventModuleService;
   }
 
   private Chain createChain() {
-    final Chain chain = new Chain("Circuit pump");
-    // Wait for pump request change and set
+    final Chain chain = new Chain("Air Condition");
+    // Wait for air condition request change and set
     chain.addStep(waitForRequestStateChangeAndSet());
     // Wait for response and after set NO_ACTION
     chain.addStep(waitForResponseAndSetNoActionStep());
@@ -50,7 +51,7 @@ public class PumpChain {
 
   private Step waitForRequestStateChangeAndSet() {
     return Step.builder()
-        .conditionDescription("Wait for pump request change")
+        .conditionDescription("Wait for air condition request change")
         .condition(checkIfRequestStateChange())
         .stepDescription("Set pump")
         .action(setPump())
@@ -64,22 +65,18 @@ public class PumpChain {
       ventModuleService
           .getAllZones()
           .map(ZoneDao::getOperation)
-          .filter(
-              operation ->
-                  (Operation.HEATING.equals(operation)
-                      || Operation.COOLING.equals(operation)
-                      || Operation.AIR_CONDITION.equals(operation)))
+          .filter(operation -> Operation.AIR_CONDITION.equals(operation))
           .collectList()
           .map(
               operationsList -> {
-                if ((Objects.isNull(pump.getResponse())
-                        || (PinState.HIGH.equals(pump.getResponse().getPinState())))
+                if ((Objects.isNull(airCondition.getResponse())
+                        || (PinState.HIGH.equals(airCondition.getResponse().getPinState())))
                     && !operationsList.isEmpty()) {
                   result.set(true);
                   goalState = PinState.LOW;
                 }
-                if ((Objects.isNull(pump.getResponse())
-                        || PinState.LOW.equals(pump.getResponse().getPinState()))
+                if ((Objects.isNull(airCondition.getResponse())
+                        || PinState.LOW.equals(airCondition.getResponse().getPinState()))
                     && operationsList.isEmpty()) {
                   result.set(true);
                   goalState = PinState.HIGH;
@@ -94,8 +91,8 @@ public class PumpChain {
 
   private Runnable setPump() {
     return () -> {
-      pump.getCommandSet().setCommandType(PinCommandType.SET);
-      pump.getCommandSet().setValue(goalState.toString());
+      airCondition.getCommandSet().setCommandType(PinCommandType.SET);
+      airCondition.getCommandSet().setValue(goalState.toString());
     };
   }
 
@@ -109,7 +106,7 @@ public class PumpChain {
   }
 
   private Predicate<Step> waitForResponse() {
-    return PredicateUtils.isResponseUpdated(pump);
+    return PredicateUtils.isResponseUpdated(airCondition);
   }
 
   private Runnable setNoAction() {
@@ -118,12 +115,14 @@ public class PumpChain {
           .getVentModuleDao()
           .map(
               ventModuleDao -> {
-                ventModuleDao.setCircuitPump(
-                    (pump.getResponse().getPinState() == PinState.HIGH) ? State.OFF : State.ON);
+                ventModuleDao.setAirCondition(
+                    (airCondition.getResponse().getPinState() == PinState.HIGH)
+                        ? State.OFF
+                        : State.ON);
                 return ventModuleDao;
               })
           .subscribe();
-      pump.getCommandSet().setCommandType(PwmCommandType.NO_ACTION);
+      airCondition.getCommandSet().setCommandType(PwmCommandType.NO_ACTION);
     };
   }
 }

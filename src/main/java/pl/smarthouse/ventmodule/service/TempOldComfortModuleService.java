@@ -129,7 +129,12 @@ public class TempOldComfortModuleService {
                     .queryParam("operation", operation)
                     .queryParam("requestPower", requestPower)
                     .build())
-        .exchangeToMono(this::processResponse);
+        .exchangeToMono(this::processResponse)
+        .map(
+            zoneDto -> {
+              tempComfortZone.setCurrentOperation(zoneDto.getOperation());
+              return zoneDto;
+            });
   }
 
   private int calculatePowerToRequest(
