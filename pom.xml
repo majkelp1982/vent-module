@@ -16,7 +16,8 @@
 	<artifactId>vent-module</artifactId>
 	<version>1.0</version>
 	<name>vent-module</name>
-	<description>Ventilation module to control air flow in zones as well as active cooling and heatnig</description>
+	<description>Ventilation module to control air flow in zones as well as forced air heating/cooling system
+	</description>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

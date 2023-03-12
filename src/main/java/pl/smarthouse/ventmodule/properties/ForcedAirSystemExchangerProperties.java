@@ -1,6 +1,6 @@
 package pl.smarthouse.ventmodule.properties;
 
-public class ActiveHeatingCoolingExchangerProperties {
+public class ForcedAirSystemExchangerProperties {
   // Exchanger
   public static final String EXCHANGER = "exchanger";
   public static final int EXCHANGER_DS18B20_PIN = 15;

@@ -17,7 +17,7 @@ import pl.smarthouse.smartmodule.services.ModuleService;
 
 import javax.annotation.PostConstruct;
 
-import static pl.smarthouse.ventmodule.properties.ActiveHeatingCoolingExchangerProperties.*;
+import static pl.smarthouse.ventmodule.properties.ForcedAirSystemExchangerProperties.*;
 import static pl.smarthouse.ventmodule.properties.AirExchangerProperties.*;
 import static pl.smarthouse.ventmodule.properties.Esp32ModuleProperties.*;
 import static pl.smarthouse.ventmodule.properties.FanProperties.*;

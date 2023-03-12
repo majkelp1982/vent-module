@@ -1,5 +1,11 @@
 package pl.smarthouse.ventmodule.configurations;
 
+import static pl.smarthouse.sharedobjects.enums.ZoneName.*;
+import static pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType.*;
+import static pl.smarthouse.ventmodule.properties.ThrottleProperties.*;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import lombok.Getter;
 import org.springframework.context.annotation.Configuration;
 import pl.smarthouse.sharedobjects.enums.Operation;
@@ -9,13 +15,6 @@ import pl.smarthouse.ventmodule.enums.FunctionType;
 import pl.smarthouse.ventmodule.model.core.*;
 import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
-
-import java.time.LocalDateTime;
-import java.util.HashMap;
-
-import static pl.smarthouse.sharedobjects.enums.ZoneName.*;
-import static pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType.*;
-import static pl.smarthouse.ventmodule.properties.ThrottleProperties.*;
 
 @Configuration
 @Getter
@@ -32,7 +31,7 @@ public class VentModuleConfiguration {
                     .outlet(Fan.builder().currentSpeed(1).goalSpeed(0).build())
                     .build())
             .airExchanger(AirExchanger.builder().build())
-            .activeHeatingCoolingExchanger(ActiveHeatingCoolingExchanger.builder().build())
+            .forcedAirSystemExchanger(ForcedAirSystemExchanger.builder().build())
             .intakeThrottle(
                 Throttle.builder()
                     .openPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)

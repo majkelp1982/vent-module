@@ -4,7 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinResponse;
-import pl.smarthouse.ventmodule.model.core.ActiveHeatingCoolingExchanger;
+import pl.smarthouse.ventmodule.model.core.ForcedAirSystemExchanger;
 import pl.smarthouse.ventmodule.model.core.AirExchanger;
 import pl.smarthouse.ventmodule.model.core.Fans;
 import pl.smarthouse.ventmodule.model.core.Throttle;
@@ -18,6 +18,6 @@ public class VentModuleDao {
   private final Fans fans;
   private final Throttle intakeThrottle;
   private final AirExchanger airExchanger;
-  private final ActiveHeatingCoolingExchanger activeHeatingCoolingExchanger;
+  private final ForcedAirSystemExchanger forcedAirSystemExchanger;
   private PinResponse circuitPump;
 }
