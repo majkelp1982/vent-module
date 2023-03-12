@@ -1,5 +1,10 @@
 package pl.smarthouse.ventmodule.chain;
 
+import static pl.smarthouse.ventmodule.properties.PumpProperties.PUMP;
+
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,14 +18,9 @@ import pl.smarthouse.smartmodule.model.actors.type.pin.PinCommandType;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinState;
 import pl.smarthouse.smartmodule.model.actors.type.pwm.PwmCommandType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
+import pl.smarthouse.ventmodule.enums.State;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.service.VentModuleService;
-
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-
-import static pl.smarthouse.ventmodule.properties.PumpProperties.PUMP;
 
 @Service
 @Slf4j
@@ -60,7 +60,7 @@ public class PumpChain {
   private Predicate<Step> checkIfRequestStateChange() {
     return step -> {
       final AtomicBoolean result = new AtomicBoolean(false);
-      goalState = PinState.LOW;
+      goalState = PinState.HIGH;
       ventModuleService
           .getAllZones()
           .map(ZoneDao::getOperation)
@@ -71,16 +71,16 @@ public class PumpChain {
           .map(
               operationsList -> {
                 if ((Objects.isNull(pump.getResponse())
-                        || (PinState.LOW.equals(pump.getResponse().getPinState())))
+                        || (PinState.HIGH.equals(pump.getResponse().getPinState())))
                     && !operationsList.isEmpty()) {
                   result.set(true);
-                  goalState = PinState.HIGH;
+                  goalState = PinState.LOW;
                 }
                 if ((Objects.isNull(pump.getResponse())
-                        || PinState.HIGH.equals(pump.getResponse().getPinState()))
+                        || PinState.LOW.equals(pump.getResponse().getPinState()))
                     && operationsList.isEmpty()) {
                   result.set(true);
-                  goalState = PinState.LOW;
+                  goalState = PinState.HIGH;
                 }
                 return operationsList;
               })
@@ -116,7 +116,8 @@ public class PumpChain {
           .getVentModuleDao()
           .map(
               ventModuleDao -> {
-                ventModuleDao.setCircuitPump(pump.getResponse());
+                ventModuleDao.setCircuitPump(
+                    (pump.getResponse().getPinState() == PinState.HIGH) ? State.OFF : State.ON);
                 return ventModuleDao;
               })
           .subscribe();

@@ -40,20 +40,50 @@ public class TempUdpController {
     return tempOldComfortModuleService.getTempComfortZones();
   }
 
-  @PostMapping(value = "/humidity/threshold")
-  public void setThreshold(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setHumidityThreshold(threshold);
+  @PostMapping(value = "/humidityThresholdLow")
+  public void setHumidityThresholdLow(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setHumidityThresholdLow(threshold);
+  }
+
+  @PostMapping(value = "/humidityThresholdHigh")
+  public void humidityThresholdHigh(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setHumidityThresholdHigh(threshold);
+  }
+
+  @PostMapping(value = "/heatingThresholdLow")
+  public void heatingThresholdLow(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setHeatingThresholdLow(threshold);
+  }
+
+  @PostMapping(value = "/heatingThresholdHigh")
+  public void heatingThresholdHigh(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setHeatingThresholdHigh(threshold);
+  }
+
+  @PostMapping(value = "/coolingThresholdHigh")
+  public void coolingThresholdHigh(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setCoolingThresholdHigh(threshold);
+  }
+
+  @PostMapping(value = "/coolingThresholdLow")
+  public void coolingThresholdLow(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setCoolingThresholdLow(threshold);
+  }
+
+  @PostMapping(value = "/airConditionThresholdHigh")
+  public void airConditionThresholdHigh(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setAirConditionThresholdHigh(threshold);
+  }
+
+  @PostMapping(value = "/airConditionThresholdLow")
+  public void airConditionThresholdLow(@RequestParam final int threshold) {
+    tempOldComfortModuleService.setAirConditionThresholdLow(threshold);
   }
 
   @PostMapping(value = "/{zoneName}/forcedAirSystemEnabled")
   public void setForcedAirSystemEnabled(
       @PathVariable final ZoneName zoneName, @RequestParam final boolean enabled) {
     tempOldComfortModuleService.setForcedAirSystemEnabled(zoneName, enabled);
-  }
-
-  @PostMapping(value = "/forcedairsystem/threshold")
-  public void setForcedAirSystemEnabled(@RequestParam final double threshold) {
-    tempOldComfortModuleService.setForcedAirSystemThreshold(threshold);
   }
 
   public class UDPListener implements Runnable {

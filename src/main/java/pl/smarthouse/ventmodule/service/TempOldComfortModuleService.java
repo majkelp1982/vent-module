@@ -1,6 +1,8 @@
 package pl.smarthouse.ventmodule.service;
 
 import java.util.HashMap;
+import java.util.List;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -11,16 +13,34 @@ import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.enums.FunctionType;
 import pl.smarthouse.ventmodule.model.core.TempComfortZone;
+import pl.smarthouse.ventmodule.model.dto.ZoneDto;
 import reactor.core.publisher.Mono;
 
 @Service
+@Setter
 @EnableScheduling
 public class TempOldComfortModuleService {
   private final WebClient webClient;
   private final VentModuleService ventModuleService;
   HashMap<ZoneName, TempComfortZone> comfortZoneHashMap = new HashMap<>();
-  int humidityThreshold = 75;
-  double forcedAirSystemThreshold = 2.0;
+  private int humidityThresholdLow = 70;
+  private int humidityThresholdHigh = 75;
+  private double heatingThresholdLow = -2.5;
+  private double heatingThresholdHigh = -1.5;
+  private double coolingThresholdHigh = 1.5;
+  private double coolingThresholdLow = 1.0;
+  private double airConditionThresholdHigh = 2.0;
+  private double airConditionThresholdLow = 1.0;
+  final TempHysteresisService tempHysteresisService =
+      new TempHysteresisService(
+          humidityThresholdLow,
+          humidityThresholdHigh,
+          heatingThresholdLow,
+          heatingThresholdHigh,
+          coolingThresholdHigh,
+          coolingThresholdLow,
+          airConditionThresholdHigh,
+          airConditionThresholdLow);
 
   public TempOldComfortModuleService(@Autowired final VentModuleService ventModuleService) {
     this.ventModuleService = ventModuleService;
@@ -37,21 +57,19 @@ public class TempOldComfortModuleService {
   public HashMap<String, Object> getTempComfortZones() {
     final HashMap<String, Object> tempMap = new HashMap<>();
     tempMap.put("comfortZoneHashMap", comfortZoneHashMap);
-    tempMap.put("humidityThreshold", humidityThreshold);
-    tempMap.put("forcedAirSystemThreshold", forcedAirSystemThreshold);
+    tempMap.put("humidityThresholdLow", humidityThresholdLow);
+    tempMap.put("humidityThresholdHigh", humidityThresholdHigh);
+    tempMap.put("heatingThresholdLow", heatingThresholdLow);
+    tempMap.put("heatingThresholdHigh", heatingThresholdHigh);
+    tempMap.put("coolingThresholdHigh", coolingThresholdHigh);
+    tempMap.put("coolingThresholdLow", coolingThresholdLow);
+    tempMap.put("airConditionThresholdHigh", airConditionThresholdHigh);
+    tempMap.put("airConditionThresholdLow", airConditionThresholdLow);
     return tempMap;
-  }
-
-  public void setHumidityThreshold(final int threshold) {
-    humidityThreshold = threshold;
   }
 
   public void setForcedAirSystemEnabled(final ZoneName zoneName, final boolean enabled) {
     comfortZoneHashMap.get(zoneName).setForcedAirSystemEnabled(enabled);
-  }
-
-  public void setForcedAirSystemThreshold(final double threshold) {
-    forcedAirSystemThreshold = threshold;
   }
 
   @Scheduled(initialDelay = 10000, fixedDelay = 10000)
@@ -59,82 +77,83 @@ public class TempOldComfortModuleService {
     comfortZoneHashMap.forEach(
         (zoneName, tempComfortZone) -> {
           if (tempComfortZone.isEnabled()) {
-            handleHumidity(zoneName, tempComfortZone);
-            handleForcedAirSystem(zoneName, tempComfortZone);
+            handleOperations(zoneName, tempComfortZone);
           }
         });
   }
 
-  private void handleHumidity(final ZoneName zoneName, final TempComfortZone tempComfortZone) {
+  private void handleOperations(final ZoneName zoneName, final TempComfortZone tempComfortZone) {
+    if (!tempComfortZone.isForcedAirSystemEnabled()) {
+      return;
+    }
+
+    // + -> to hot  - -> to cold
+    final double deltaTemp =
+        tempComfortZone.getTemperature() - tempComfortZone.getRequiredTemperature();
+
+    final Operation calculatedOperation =
+        tempHysteresisService.update(
+            tempComfortZone.getCurrentOperation(), tempComfortZone.getHumidity(), deltaTemp);
+
     ventModuleService
         .getZone(zoneName)
-        .filter(zoneDao -> FunctionType.INLET.equals(zoneDao.getFunctionType()))
         .flatMap(
             zoneDao -> {
-              if (tempComfortZone.getHumidity() > humidityThreshold) {
-                return webClient
-                    .post()
-                    .uri(
-                        uriBuilder ->
-                            uriBuilder
-                                .path("localhost:9999/zones/" + zoneName + "/operation")
-                                .queryParam("operation", Operation.HUMIDITY_ALERT)
-                                .queryParam(
-                                    "requestPower",
-                                    (tempComfortZone.getHumidity() > (humidityThreshold + 10)
-                                        ? 100
-                                        : 75))
-                                .build())
-                    .exchangeToMono(this::processResponse);
+              if (!FunctionType.INLET.equals(zoneDao.getFunctionType())
+                  && Operation.HUMIDITY_ALERT.equals(calculatedOperation)) {
+                return Mono.just(Operation.STANDBY);
               }
-              return Mono.empty();
+
+              final List<Operation> operationList =
+                  List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_CONDITION);
+              if (!FunctionType.OUTLET.equals(zoneDao.getFunctionType())
+                  && operationList.contains(calculatedOperation)) {
+                return Mono.just(Operation.STANDBY);
+              }
+              return Mono.just(calculatedOperation);
             })
+        .flatMap(
+            resultOperation -> sendComfortZoneOperation(zoneName, resultOperation, tempComfortZone))
         .subscribe();
   }
 
-  private void handleForcedAirSystem(
-      final ZoneName zoneName, final TempComfortZone tempComfortZone) {
-    ventModuleService
-        .getZone(zoneName)
-        .filter(zoneDao -> FunctionType.OUTLET.equals(zoneDao.getFunctionType()))
-        .flatMap(
-            zoneDao -> {
-              if (tempComfortZone.isForcedAirSystemEnabled()) {
-                if (tempComfortZone.getTemperature()
-                    >= (tempComfortZone.getRequiredTemperature() + forcedAirSystemThreshold)) {
-                  return webClient
-                      .post()
-                      .uri(
-                          uriBuilder ->
-                              uriBuilder
-                                  .path("localhost:9999/zones/" + zoneName + "/operation")
-                                  .queryParam("operation", Operation.COOLING)
-                                  .queryParam("requestPower", Integer.toString(30))
-                                  .build())
-                      .exchangeToMono(this::processResponse);
-                }
-                if (tempComfortZone.getTemperature()
-                    <= (tempComfortZone.getRequiredTemperature() - forcedAirSystemThreshold)) {
-                  return webClient
-                      .post()
-                      .uri(
-                          uriBuilder ->
-                              uriBuilder
-                                  .path("localhost:9999/zones/" + zoneName + "/operation")
-                                  .queryParam("operation", Operation.HEATING)
-                                  .queryParam("requestPower", Integer.toString(30))
-                                  .build())
-                      .exchangeToMono(this::processResponse);
-                }
-              }
-              return Mono.empty();
-            })
-        .subscribe();
+  private Mono<ZoneDto> sendComfortZoneOperation(
+      final ZoneName zoneName, final Operation operation, final TempComfortZone tempComfortZone) {
+    final int requestPower = calculatePowerToRequest(operation, tempComfortZone);
+    return webClient
+        .post()
+        .uri(
+            uriBuilder ->
+                uriBuilder
+                    .path("localhost:9999/zones/" + zoneName + "/operation")
+                    .queryParam("operation", operation)
+                    .queryParam("requestPower", requestPower)
+                    .build())
+        .exchangeToMono(this::processResponse);
   }
 
-  private Mono<String> processResponse(final ClientResponse clientResponse) {
+  private int calculatePowerToRequest(
+      final Operation operation, final TempComfortZone tempComfortZone) {
+    if (Operation.HUMIDITY_ALERT.equals(operation)) {
+      if (tempComfortZone.getHumidity() >= (humidityThresholdHigh + 10)) {
+        return 100;
+      } else {
+        return 75;
+      }
+    }
+    final List operationList = List.of(Operation.HEATING, Operation.COOLING);
+    if (operationList.contains(operation)) {
+      return 30;
+    }
+    if (Operation.AIR_CONDITION.equals(operation)) {
+      return 50;
+    }
+    return 0;
+  }
+
+  private Mono<ZoneDto> processResponse(final ClientResponse clientResponse) {
     if (clientResponse.statusCode().is2xxSuccessful()) {
-      return Mono.empty();
+      return clientResponse.bodyToMono(ZoneDto.class);
     } else {
       return clientResponse.createException().flatMap(Mono::error);
     }

@@ -1,15 +1,14 @@
 package pl.smarthouse.ventmodule.model.dao;
 
+import java.util.HashMap;
 import lombok.Builder;
 import lombok.Data;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
-import pl.smarthouse.smartmodule.model.actors.type.pin.PinResponse;
-import pl.smarthouse.ventmodule.model.core.ForcedAirSystemExchanger;
+import pl.smarthouse.ventmodule.enums.State;
 import pl.smarthouse.ventmodule.model.core.AirExchanger;
 import pl.smarthouse.ventmodule.model.core.Fans;
+import pl.smarthouse.ventmodule.model.core.ForcedAirSystemExchanger;
 import pl.smarthouse.ventmodule.model.core.Throttle;
-
-import java.util.HashMap;
 
 @Data
 @Builder
@@ -19,5 +18,6 @@ public class VentModuleDao {
   private final Throttle intakeThrottle;
   private final AirExchanger airExchanger;
   private final ForcedAirSystemExchanger forcedAirSystemExchanger;
-  private PinResponse circuitPump;
+  private State circuitPump;
+  private State airCondition;
 }
