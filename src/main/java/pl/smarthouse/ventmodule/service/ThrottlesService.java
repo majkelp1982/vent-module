@@ -1,13 +1,12 @@
 package pl.smarthouse.ventmodule.service;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.ventmodule.model.core.Throttle;
 import reactor.core.publisher.Mono;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor

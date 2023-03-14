@@ -1,5 +1,6 @@
 package pl.smarthouse.ventmodule.model.dao;
 
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
@@ -7,8 +8,6 @@ import lombok.Setter;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.ventmodule.enums.FunctionType;
 import pl.smarthouse.ventmodule.model.core.Throttle;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

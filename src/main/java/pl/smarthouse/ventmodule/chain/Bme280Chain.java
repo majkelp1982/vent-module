@@ -1,5 +1,7 @@
 package pl.smarthouse.ventmodule.chain;
 
+import static pl.smarthouse.ventmodule.properties.AirExchangerProperties.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.smartchain.model.core.Chain;
@@ -13,8 +15,6 @@ import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280Response;
 import pl.smarthouse.smartmodule.model.enums.ActorType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
 import pl.smarthouse.ventmodule.service.VentModuleService;
-
-import static pl.smarthouse.ventmodule.properties.AirExchangerProperties.*;
 
 @Service
 public class Bme280Chain {

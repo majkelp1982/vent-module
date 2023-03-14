@@ -1,5 +1,9 @@
 package pl.smarthouse.ventmodule.chain;
 
+import static pl.smarthouse.ventmodule.properties.ThrottleProperties.THROTTLES;
+
+import java.util.Objects;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,11 +18,6 @@ import pl.smarthouse.ventmodule.model.core.Throttle;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
-import java.util.function.Predicate;
-
-import static pl.smarthouse.ventmodule.properties.ThrottleProperties.THROTTLES;
 
 @Service
 @Slf4j

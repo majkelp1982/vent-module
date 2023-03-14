@@ -1,5 +1,10 @@
 package pl.smarthouse.ventmodule.chain;
 
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_INLET_REV_COUNTER;
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_OUTLET_REV_COUNTER;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,12 +17,6 @@ import pl.smarthouse.smartmodule.model.actors.type.pin.PinCommandType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
 import pl.smarthouse.ventmodule.model.core.Fan;
 import pl.smarthouse.ventmodule.service.VentModuleService;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Predicate;
-
-import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_INLET_REV_COUNTER;
-import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_OUTLET_REV_COUNTER;
 
 @Service
 @Slf4j

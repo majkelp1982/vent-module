@@ -1,5 +1,10 @@
 package pl.smarthouse.ventmodule.chain;
 
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_INLET;
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_OUTLET;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +18,6 @@ import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
 import pl.smarthouse.ventmodule.model.core.Fan;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 import reactor.core.publisher.Mono;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-
-import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_INLET;
-import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_OUTLET;
 
 @Service
 @Slf4j

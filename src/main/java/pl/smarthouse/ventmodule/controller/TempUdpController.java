@@ -116,7 +116,7 @@ public class TempUdpController {
     private boolean isModuleComfortUdpFrame(final DatagramPacket packet) {
       final int TYPE_MODULE_COMFORT = 10;
       return (packetData[0] == TYPE_MODULE_COMFORT)
-        && packet.getLength() == PACKET_SIZE_MODULE_COMFORT;
+          && packet.getLength() == PACKET_SIZE_MODULE_COMFORT;
     }
 
     private void convertToUnsignedIntValues(final DatagramPacket packet) {
