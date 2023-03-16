@@ -22,27 +22,12 @@ import reactor.core.publisher.Mono;
 public class TempOldComfortModuleService {
   private final WebClient webClient;
   private final VentModuleService ventModuleService;
+  private final TempHysteresisService tempHysteresisService;
   HashMap<ZoneName, TempComfortZone> comfortZoneHashMap = new HashMap<>();
-  private int humidityThresholdLow = 70;
-  private int humidityThresholdHigh = 75;
-  private double heatingThresholdLow = -2.5;
-  private double heatingThresholdHigh = -1.5;
-  private double coolingThresholdHigh = 1.5;
-  private double coolingThresholdLow = 1.0;
-  private double airConditionThresholdHigh = 2.0;
-  private double airConditionThresholdLow = 1.0;
-  final TempHysteresisService tempHysteresisService =
-      new TempHysteresisService(
-          humidityThresholdLow,
-          humidityThresholdHigh,
-          heatingThresholdLow,
-          heatingThresholdHigh,
-          coolingThresholdHigh,
-          coolingThresholdLow,
-          airConditionThresholdHigh,
-          airConditionThresholdLow);
 
-  public TempOldComfortModuleService(@Autowired final VentModuleService ventModuleService) {
+  public TempOldComfortModuleService(
+      @Autowired final VentModuleService ventModuleService,
+      @Autowired final TempHysteresisService tempHysteresisService) {
     this.ventModuleService = ventModuleService;
     this.webClient = WebClient.create();
     comfortZoneHashMap.put(ZoneName.SALON, new TempComfortZone(true));
@@ -52,19 +37,20 @@ public class TempOldComfortModuleService {
     comfortZoneHashMap.put(ZoneName.NATALIA, new TempComfortZone(true));
     comfortZoneHashMap.put(ZoneName.KAROLINA, new TempComfortZone(true));
     comfortZoneHashMap.put(ZoneName.LAZ_GORA, new TempComfortZone(true));
+    this.tempHysteresisService = tempHysteresisService;
   }
 
   public HashMap<String, Object> getTempComfortZones() {
     final HashMap<String, Object> tempMap = new HashMap<>();
     tempMap.put("comfortZoneHashMap", comfortZoneHashMap);
-    tempMap.put("humidityThresholdLow", humidityThresholdLow);
-    tempMap.put("humidityThresholdHigh", humidityThresholdHigh);
-    tempMap.put("heatingThresholdLow", heatingThresholdLow);
-    tempMap.put("heatingThresholdHigh", heatingThresholdHigh);
-    tempMap.put("coolingThresholdHigh", coolingThresholdHigh);
-    tempMap.put("coolingThresholdLow", coolingThresholdLow);
-    tempMap.put("airConditionThresholdHigh", airConditionThresholdHigh);
-    tempMap.put("airConditionThresholdLow", airConditionThresholdLow);
+    tempMap.put("humidityThresholdLow", tempHysteresisService.getHumidityThresholdLow());
+    tempMap.put("humidityThresholdHigh", tempHysteresisService.getHumidityThresholdHigh());
+    tempMap.put("heatingThresholdLow", tempHysteresisService.getHeatingThresholdLow());
+    tempMap.put("heatingThresholdHigh", tempHysteresisService.getHeatingThresholdHigh());
+    tempMap.put("coolingThresholdHigh", tempHysteresisService.getCoolingThresholdHigh());
+    tempMap.put("coolingThresholdLow", tempHysteresisService.getCoolingThresholdLow());
+    tempMap.put("airConditionThresholdHigh", tempHysteresisService.getAirConditionThresholdHigh());
+    tempMap.put("airConditionThresholdLow", tempHysteresisService.getAirConditionThresholdLow());
     return tempMap;
   }
 
@@ -83,10 +69,6 @@ public class TempOldComfortModuleService {
   }
 
   private void handleOperations(final ZoneName zoneName, final TempComfortZone tempComfortZone) {
-    if (!tempComfortZone.isForcedAirSystemEnabled()) {
-      return;
-    }
-
     // + -> to hot  - -> to cold
     final double deltaTemp =
         tempComfortZone.getTemperature() - tempComfortZone.getRequiredTemperature();
@@ -103,7 +85,7 @@ public class TempOldComfortModuleService {
                   && Operation.HUMIDITY_ALERT.equals(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
               }
-
+              
               final List<Operation> operationList =
                   List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_CONDITION);
               if (!FunctionType.OUTLET.equals(zoneDao.getFunctionType())
@@ -140,7 +122,8 @@ public class TempOldComfortModuleService {
   private int calculatePowerToRequest(
       final Operation operation, final TempComfortZone tempComfortZone) {
     if (Operation.HUMIDITY_ALERT.equals(operation)) {
-      if (tempComfortZone.getHumidity() >= (humidityThresholdHigh + 10)) {
+      if (tempComfortZone.getHumidity()
+          >= (tempHysteresisService.getHumidityThresholdHigh() + 10)) {
         return 100;
       } else {
         return 75;

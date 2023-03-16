@@ -1,35 +1,22 @@
 package pl.smarthouse.ventmodule.service;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.enums.Operation;
 
+@Service
+@Setter
+@Getter
 public class TempHysteresisService {
-  private final int humidityThresholdLow;
-  private final int humidityThresholdHigh;
-  private final double heatingThresholdLow;
-  private final double heatingThresholdHigh;
-  private final double coolingThresholdHigh;
-  private final double coolingThresholdLow;
-  private final double airConditionThresholdHigh;
-  private final double airConditionThresholdLow;
-
-  public TempHysteresisService(
-      final int humidityThresholdLow,
-      final int humidityThresholdHigh,
-      final double heatingThresholdLow,
-      final double heatingThresholdHigh,
-      final double coolingThresholdHigh,
-      final double coolingThresholdLow,
-      final double airConditionThresholdHigh,
-      final double airConditionThresholdLow) {
-    this.humidityThresholdLow = humidityThresholdLow;
-    this.humidityThresholdHigh = humidityThresholdHigh;
-    this.heatingThresholdLow = heatingThresholdLow;
-    this.heatingThresholdHigh = heatingThresholdHigh;
-    this.coolingThresholdHigh = coolingThresholdHigh;
-    this.coolingThresholdLow = coolingThresholdLow;
-    this.airConditionThresholdHigh = airConditionThresholdHigh;
-    this.airConditionThresholdLow = airConditionThresholdLow;
-  }
+  private int humidityThresholdLow = 60;
+  private int humidityThresholdHigh = 75;
+  private double heatingThresholdLow = -2.5;
+  private double heatingThresholdHigh = -1.5;
+  private double coolingThresholdHigh = 1.5;
+  private double coolingThresholdLow = 1.0;
+  private double airConditionThresholdHigh = 2.0;
+  private double airConditionThresholdLow = 1.0;
 
   public Operation update(
       final Operation currentOperation, final int humidity, final double deltaTemp) {

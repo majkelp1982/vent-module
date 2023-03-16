@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
+import pl.smarthouse.ventmodule.service.TempHysteresisService;
 import pl.smarthouse.ventmodule.service.TempOldComfortModuleService;
 
 @Controller
@@ -23,10 +24,13 @@ public class TempUdpController {
   int localPort = 6000;
   Thread UDPThread = new Thread(new UDPListener());
   TempOldComfortModuleService tempOldComfortModuleService;
+  TempHysteresisService tempHysteresisService;
 
   public TempUdpController(
-      @Autowired final TempOldComfortModuleService tempOldComfortModuleService) {
+      @Autowired final TempOldComfortModuleService tempOldComfortModuleService,
+      @Autowired final TempHysteresisService tempHysteresisService) {
     this.tempOldComfortModuleService = tempOldComfortModuleService;
+    this.tempHysteresisService = tempHysteresisService;
     try {
       multicastSocket = new MulticastSocket(localPort);
     } catch (final IOException e) {
@@ -42,42 +46,42 @@ public class TempUdpController {
 
   @PostMapping(value = "/humidityThresholdLow")
   public void setHumidityThresholdLow(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setHumidityThresholdLow(threshold);
+    tempHysteresisService.setHumidityThresholdLow(threshold);
   }
 
   @PostMapping(value = "/humidityThresholdHigh")
   public void humidityThresholdHigh(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setHumidityThresholdHigh(threshold);
+    tempHysteresisService.setHumidityThresholdHigh(threshold);
   }
 
   @PostMapping(value = "/heatingThresholdLow")
   public void heatingThresholdLow(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setHeatingThresholdLow(threshold);
+    tempHysteresisService.setHeatingThresholdLow(threshold);
   }
 
   @PostMapping(value = "/heatingThresholdHigh")
   public void heatingThresholdHigh(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setHeatingThresholdHigh(threshold);
+    tempHysteresisService.setHeatingThresholdHigh(threshold);
   }
 
   @PostMapping(value = "/coolingThresholdHigh")
   public void coolingThresholdHigh(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setCoolingThresholdHigh(threshold);
+    tempHysteresisService.setCoolingThresholdHigh(threshold);
   }
 
   @PostMapping(value = "/coolingThresholdLow")
   public void coolingThresholdLow(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setCoolingThresholdLow(threshold);
+    tempHysteresisService.setCoolingThresholdLow(threshold);
   }
 
   @PostMapping(value = "/airConditionThresholdHigh")
   public void airConditionThresholdHigh(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setAirConditionThresholdHigh(threshold);
+    tempHysteresisService.setAirConditionThresholdHigh(threshold);
   }
 
   @PostMapping(value = "/airConditionThresholdLow")
   public void airConditionThresholdLow(@RequestParam final int threshold) {
-    tempOldComfortModuleService.setAirConditionThresholdLow(threshold);
+    tempHysteresisService.setAirConditionThresholdLow(threshold);
   }
 
   @PostMapping(value = "/{zoneName}/forcedAirSystemEnabled")

@@ -8,8 +8,7 @@ import pl.smarthouse.sharedobjects.enums.Operation;
 class TempHysteresisServiceTest {
   @Test
   void updateTest() {
-    final TempHysteresisService tempHysteresisService =
-        new TempHysteresisService(70, 75, -2.5, -1.5, 1.5, 1.0, 2.0, 1.0);
+    final TempHysteresisService tempHysteresisService = new TempHysteresisService();
     final Operation initOperation = Operation.STANDBY;
     Operation currentOperation;
     // HUMIDITY TEST PART I
