@@ -119,7 +119,7 @@ public class FansChain {
 
   private int calculateDutyCycle(final int power) {
     // Power parameter is from 0 to 100
-    // return value is from 0 to 255
-    return ((int) (255 * (power / 100.00)));
+    // return value is from 255 to 0
+    return (255 - ((int) (255 * (power / 100.00))));
   }
 }
