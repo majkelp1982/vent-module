@@ -53,7 +53,7 @@ public class FansChain {
   private Step waitForFanStateChangeAndSetGoalPower() {
     return Step.builder()
         .conditionDescription("Wait for fans state change")
-        .condition(checkIfFansGoalPowerIfDifferentThenCurrent())
+        .condition(checkIfFansGoalPowerIfDifferentThenCurrent().or(PredicateUtils.delaySeconds(30)))
         .stepDescription("Set goal power to inlet and outlet fans")
         .action(setGoalPower())
         .build();
