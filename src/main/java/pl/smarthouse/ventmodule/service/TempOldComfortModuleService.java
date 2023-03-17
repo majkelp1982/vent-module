@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ public class TempOldComfortModuleService {
   private final VentModuleService ventModuleService;
   private final TempHysteresisService tempHysteresisService;
   HashMap<ZoneName, TempComfortZone> comfortZoneHashMap = new HashMap<>();
+
+  @Autowired private Environment env;
 
   public TempOldComfortModuleService(
       @Autowired final VentModuleService ventModuleService,
@@ -102,12 +105,13 @@ public class TempOldComfortModuleService {
   private Mono<ZoneDto> sendComfortZoneOperation(
       final ZoneName zoneName, final Operation operation, final TempComfortZone tempComfortZone) {
     final int requestPower = calculatePowerToRequest(operation, tempComfortZone);
+    final String port = env.getProperty("local.server.port");
     return webClient
         .post()
         .uri(
             uriBuilder ->
                 uriBuilder
-                    .path("localhost:9999/zones/" + zoneName + "/operation")
+                    .path("localhost:" + port + "/zones/" + zoneName + "/operation")
                     .queryParam("operation", operation)
                     .queryParam("requestPower", requestPower)
                     .build())

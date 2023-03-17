@@ -109,8 +109,9 @@ public class RevCounterChain {
 
   private Runnable setNoAction() {
     return () -> {
-      inletFan.setRevolution(fanInletRevCounter.getResponse().getCounter());
-      outletFan.setRevolution(fanOutletRevCounter.getResponse().getCounter());
+      // 0.65 ratio. Interruption flacking. Need to be switch to read PWM and should be better)
+      inletFan.setRevolution((int) (fanInletRevCounter.getResponse().getCounter() * 0.65));
+      outletFan.setRevolution((int) (fanOutletRevCounter.getResponse().getCounter() * 0.65));
       fanInletRevCounter.getCommandSet().setCommandType(PinCommandType.NO_ACTION);
       fanOutletRevCounter.getCommandSet().setCommandType(PinCommandType.NO_ACTION);
     };
