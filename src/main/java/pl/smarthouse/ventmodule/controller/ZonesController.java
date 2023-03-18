@@ -1,5 +1,6 @@
 package pl.smarthouse.ventmodule.controller;
 
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,11 @@ public class ZonesController {
       @RequestParam final Operation operation,
       @RequestParam(required = false) final int requestPower) {
     return zoneService.setZoneOperation(zoneName, operation, requestPower);
+  }
+
+  @GetMapping(value = "/activ")
+  public Mono<HashMap<ZoneName, ZoneDto>> getActiveZones() {
+    return zoneService.getActiveZones();
   }
 
   @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Illegal arguments")

@@ -1,5 +1,6 @@
 package pl.smarthouse.ventmodule.service;
 
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -14,8 +15,6 @@ import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.model.dto.VentModuleDto;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 @Service
 @RequiredArgsConstructor
@@ -50,14 +49,8 @@ public class VentModuleService {
     return Mono.just(ventModuleConfiguration.getVentModuleDao().getIntakeThrottle());
   }
 
-  public Flux<Tuple2<ZoneName, ZoneDao>> getAllZonesWithZoneNames() {
-    return Flux.fromIterable(
-            ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().keySet())
-        .map(
-            zoneName ->
-                Tuples.of(
-                    zoneName,
-                    ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().get(zoneName)));
+  public Mono<HashMap<ZoneName, ZoneDao>> getZonesFullData() {
+    return Mono.just(ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap());
   }
 
   public Mono<Fans> getFans() {

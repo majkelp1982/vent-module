@@ -88,7 +88,7 @@ public class TempOldComfortModuleService {
                   && Operation.HUMIDITY_ALERT.equals(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
               }
-              
+
               final List<Operation> operationList =
                   List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_CONDITION);
               if (!FunctionType.OUTLET.equals(zoneDao.getFunctionType())
