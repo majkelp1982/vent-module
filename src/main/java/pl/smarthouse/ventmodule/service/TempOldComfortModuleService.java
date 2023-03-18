@@ -95,6 +95,10 @@ public class TempOldComfortModuleService {
                   && operationList.contains(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
               }
+              if (!Operation.STANDBY.equals(calculatedOperation)
+                  && !tempComfortZone.isForcedAirSystemEnabled()) {
+                return Mono.just(Operation.STANDBY);
+              }
               return Mono.just(calculatedOperation);
             })
         .flatMap(
