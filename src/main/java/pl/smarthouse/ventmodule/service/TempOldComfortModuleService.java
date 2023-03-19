@@ -95,7 +95,9 @@ public class TempOldComfortModuleService {
                   && operationList.contains(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
               }
-              if (!Operation.STANDBY.equals(calculatedOperation)
+              final List<Operation> forcedAirOperations =
+                  List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_CONDITION);
+              if (forcedAirOperations.contains(calculatedOperation)
                   && !tempComfortZone.isForcedAirSystemEnabled()) {
                 return Mono.just(Operation.STANDBY);
               }
