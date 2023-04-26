@@ -1,5 +1,7 @@
 package pl.smarthouse.ventmodule.properties;
 
+import pl.smarthouse.smartmonitoring.model.NumberCompareProperties;
+
 public class FanProperties {
   // Fan PWM controllers
   // Generic
@@ -23,4 +25,12 @@ public class FanProperties {
   public static final int FAN_INLET_DEFAULT_DUTY_CYCLE = 255;
   public static final boolean FAN_INLET_DEFAULT_ENABLED = true;
   public static final int TIMEBASE_IN_SECONDS = 10;
+
+  public static NumberCompareProperties getSpeedProperties() {
+    return NumberCompareProperties.builder().saveEnabled(true).saveTolerance(1).build();
+  }
+
+  public static NumberCompareProperties getRevolutionsProperties() {
+    return NumberCompareProperties.builder().saveEnabled(true).saveTolerance(100).build();
+  }
 }

@@ -6,32 +6,62 @@ import static pl.smarthouse.ventmodule.properties.ThrottleProperties.*;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
+import javax.annotation.PostConstruct;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
+import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280Response;
+import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType;
+import pl.smarthouse.smartmonitoring.model.EnumCompareProperties;
+import pl.smarthouse.smartmonitoring.model.NumberCompareProperties;
+import pl.smarthouse.smartmonitoring.properties.defaults.Bme280DefaultProperties;
+import pl.smarthouse.smartmonitoring.properties.defaults.Ds18b20DefaultProperties;
+import pl.smarthouse.smartmonitoring.service.CompareProcessor;
+import pl.smarthouse.smartmonitoring.service.MonitoringService;
 import pl.smarthouse.ventmodule.enums.FunctionType;
+import pl.smarthouse.ventmodule.enums.State;
 import pl.smarthouse.ventmodule.model.core.*;
 import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
+import pl.smarthouse.ventmodule.properties.Esp32ModuleProperties;
+import pl.smarthouse.ventmodule.properties.FanProperties;
 
 @Configuration
+@RequiredArgsConstructor
 @Getter
 public class VentModuleConfiguration {
-  private final VentModuleDao ventModuleDao;
+  private final CompareProcessor compareProcessor;
+  private final MonitoringService monitoringService;
+  private VentModuleDao ventModuleDao;
 
-  public VentModuleConfiguration() {
+  @PostConstruct
+  void postConstruct() {
     ventModuleDao =
         VentModuleDao.builder()
+            .moduleName(Esp32ModuleProperties.MODULE_TYPE)
             .zoneDaoHashMap(createZones())
             .fans(
                 Fans.builder()
                     .inlet(Fan.builder().currentSpeed(1).goalSpeed(0).build())
                     .outlet(Fan.builder().currentSpeed(1).goalSpeed(0).build())
                     .build())
-            .airExchanger(AirExchanger.builder().build())
-            .forcedAirSystemExchanger(ForcedAirSystemExchanger.builder().build())
+            .airExchanger(
+                AirExchanger.builder()
+                    .inlet(new Bme280Response())
+                    .outlet(new Bme280Response())
+                    .freshAir(new Bme280Response())
+                    .userAir(new Bme280Response())
+                    .build())
+            .forcedAirSystemExchanger(
+                ForcedAirSystemExchanger.builder()
+                    .watterIn(new Ds18b20Result())
+                    .watterOut(new Ds18b20Result())
+                    .airIn(new Ds18b20Result())
+                    .airOut(new Ds18b20Result())
+                    .build())
             .intakeThrottle(
                 Throttle.builder()
                     .openPosition(THROTTLE_INTAKE_EXTERNAL_SOURCE)
@@ -40,7 +70,56 @@ public class VentModuleConfiguration {
                     .currentPosition(0)
                     .commandType(WRITE_SERVO0_MICROSECONDS)
                     .build())
+            .airCondition(State.OFF)
+            .circuitPump(State.OFF)
             .build();
+    monitoringService.setModuleDaoObject(ventModuleDao);
+    createCompareMap();
+  }
+
+  private void createCompareMap() {
+    compareProcessor.addMap(
+        "airCondition", EnumCompareProperties.builder().saveEnabled(true).build());
+
+    Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.freshAir");
+    Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.inlet");
+    Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.outlet");
+    Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.userAir");
+
+    compareProcessor.addMap(
+        "circuitPump", EnumCompareProperties.builder().saveEnabled(true).build());
+
+    compareProcessor.addMap("fans.inlet.currentSpeed", FanProperties.getSpeedProperties());
+    compareProcessor.addMap("fans.inlet.goalSpeed", FanProperties.getSpeedProperties());
+    compareProcessor.addMap("fans.inlet.revolution", FanProperties.getRevolutionsProperties());
+
+    compareProcessor.addMap("fans.outlet.currentSpeed", FanProperties.getSpeedProperties());
+    compareProcessor.addMap("fans.outlet.goalSpeed", FanProperties.getSpeedProperties());
+    compareProcessor.addMap("fans.outlet.revolution", FanProperties.getRevolutionsProperties());
+
+    Ds18b20DefaultProperties.setDefaultProperties(
+        compareProcessor, "forcedAirSystemExchanger.airIn");
+    Ds18b20DefaultProperties.setDefaultProperties(
+        compareProcessor, "forcedAirSystemExchanger.airOut");
+    Ds18b20DefaultProperties.setDefaultProperties(
+        compareProcessor, "forcedAirSystemExchanger.watterIn");
+    Ds18b20DefaultProperties.setDefaultProperties(
+        compareProcessor, "forcedAirSystemExchanger.watterOut");
+
+    compareProcessor.addMap(
+        "intakeThrottle.closePosition",
+        NumberCompareProperties.builder().saveEnabled(true).saveTolerance(1).build());
+    compareProcessor.addMap(
+        "intakeThrottle.commandType", EnumCompareProperties.builder().saveEnabled(false).build());
+    compareProcessor.addMap(
+        "intakeThrottle.currentPosition",
+        NumberCompareProperties.builder().saveEnabled(true).saveTolerance(1).build());
+    compareProcessor.addMap(
+        "intakeThrottle.goalPosition",
+        NumberCompareProperties.builder().saveEnabled(true).saveTolerance(1).build());
+    compareProcessor.addMap(
+        "intakeThrottle.openPosition",
+        NumberCompareProperties.builder().saveEnabled(true).saveTolerance(1).build());
   }
 
   private HashMap<ZoneName, ZoneDao> createZones() {
