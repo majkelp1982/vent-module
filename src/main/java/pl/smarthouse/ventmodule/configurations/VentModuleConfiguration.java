@@ -10,6 +10,7 @@ import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280Response;
@@ -22,7 +23,6 @@ import pl.smarthouse.smartmonitoring.properties.defaults.Ds18b20DefaultPropertie
 import pl.smarthouse.smartmonitoring.service.CompareProcessor;
 import pl.smarthouse.smartmonitoring.service.MonitoringService;
 import pl.smarthouse.ventmodule.enums.FunctionType;
-import pl.smarthouse.ventmodule.enums.State;
 import pl.smarthouse.ventmodule.model.core.*;
 import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;

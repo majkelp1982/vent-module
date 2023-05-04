@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.smartchain.model.core.Chain;
 import pl.smarthouse.smartchain.model.core.Step;
@@ -18,7 +19,6 @@ import pl.smarthouse.smartmodule.model.actors.type.pin.PinCommandType;
 import pl.smarthouse.smartmodule.model.actors.type.pin.PinState;
 import pl.smarthouse.smartmodule.model.actors.type.pwm.PwmCommandType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
-import pl.smarthouse.ventmodule.enums.State;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 

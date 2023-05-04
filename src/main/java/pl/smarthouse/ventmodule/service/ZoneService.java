@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.enums.FunctionType;
 import pl.smarthouse.ventmodule.exceptions.InvalidZoneOperationException;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
-import pl.smarthouse.ventmodule.model.dto.ZoneDto;
+import pl.smarthouse.ventmodule.utils.ModelMapper;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -28,7 +28,6 @@ public class ZoneService {
   private final int ZONE_OUTDATED_IN_MINUTES = 2;
 
   private final VentModuleService ventModuleService;
-  private final ModelMapper modelMapper = new ModelMapper();
 
   public Mono<ZoneDto> setZoneOperation(
       final ZoneName zoneName, final Operation operation, final int requestPower) {
@@ -45,7 +44,7 @@ public class ZoneService {
               zoneDao.setOperation(operation);
               return Mono.just(zoneDao);
             })
-        .map(zoneDao -> modelMapper.map(zoneDao, ZoneDto.class));
+        .map(ModelMapper::toZoneDto);
   }
 
   public Mono<HashMap<ZoneName, ZoneDto>> getActiveZones() {
@@ -57,7 +56,7 @@ public class ZoneService {
               zoneNameZoneDaoHashMap.forEach(
                   (zoneName, zoneDao) -> {
                     if (!Operation.STANDBY.equals(zoneDao.getOperation())) {
-                      resultHashMap.put(zoneName, modelMapper.map(zoneDao, ZoneDto.class));
+                      resultHashMap.put(zoneName, ModelMapper.toZoneDto(zoneDao));
                     }
                   });
               return resultHashMap;
@@ -87,7 +86,7 @@ public class ZoneService {
                     .findFirst()
                     .orElseGet(Mono::empty))
         .flatMap(zoneDao -> resetZone(zoneDao))
-        .map(zoneDao -> modelMapper.map(zoneDao, ZoneDto.class));
+        .map(zoneDao -> ModelMapper.toZoneDto(zoneDao));
   }
 
   private void validateRequest(
