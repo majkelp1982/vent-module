@@ -1,9 +1,10 @@
 package pl.smarthouse.ventmodule.service;
 
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
 import pl.smarthouse.ventmodule.model.core.Fan;
@@ -11,22 +12,18 @@ import pl.smarthouse.ventmodule.model.core.Fans;
 import pl.smarthouse.ventmodule.model.core.Throttle;
 import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
-import pl.smarthouse.ventmodule.model.dto.VentModuleDto;
+import pl.smarthouse.ventmodule.utils.ModelMapper;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
-import reactor.util.function.Tuples;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class VentModuleService {
   private final VentModuleConfiguration ventModuleConfiguration;
-  private final ModelMapper modelMapper = new ModelMapper();
 
   public Mono<VentModuleDto> getVentModule() {
-    return Mono.just(
-        modelMapper.map(ventModuleConfiguration.getVentModuleDao(), VentModuleDto.class));
+    return Mono.just(ModelMapper.toVentModuleDto(ventModuleConfiguration.getVentModuleDao()));
   }
 
   public Mono<VentModuleDao> getVentModuleDao() {
@@ -50,14 +47,8 @@ public class VentModuleService {
     return Mono.just(ventModuleConfiguration.getVentModuleDao().getIntakeThrottle());
   }
 
-  public Flux<Tuple2<ZoneName, ZoneDao>> getAllZonesWithZoneNames() {
-    return Flux.fromIterable(
-            ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().keySet())
-        .map(
-            zoneName ->
-                Tuples.of(
-                    zoneName,
-                    ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().get(zoneName)));
+  public Mono<HashMap<ZoneName, ZoneDao>> getZonesFullData() {
+    return Mono.just(ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap());
   }
 
   public Mono<Fans> getFans() {

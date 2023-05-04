@@ -1,12 +1,13 @@
 package pl.smarthouse.ventmodule.controller;
 
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.exceptions.InvalidZoneOperationException;
-import pl.smarthouse.ventmodule.model.dto.ZoneDto;
 import pl.smarthouse.ventmodule.service.ZoneService;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,11 @@ public class ZonesController {
       @RequestParam final Operation operation,
       @RequestParam(required = false) final int requestPower) {
     return zoneService.setZoneOperation(zoneName, operation, requestPower);
+  }
+
+  @GetMapping(value = "/activ")
+  public Mono<HashMap<ZoneName, ZoneDto>> getActiveZones() {
+    return zoneService.getActiveZones();
   }
 
   @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Illegal arguments")

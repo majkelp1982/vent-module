@@ -1,6 +1,7 @@
 package pl.smarthouse.ventmodule.model.core;
 
 import lombok.Data;
+import pl.smarthouse.sharedobjects.enums.Operation;
 
 @Data
 public class TempComfortZone {
@@ -10,6 +11,8 @@ public class TempComfortZone {
   private double requiredTemperature;
 
   private boolean forcedAirSystemEnabled;
+
+  private Operation currentOperation;
 
   public TempComfortZone(final boolean enabled) {
     this.enabled = enabled;

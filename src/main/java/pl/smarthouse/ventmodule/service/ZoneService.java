@@ -1,20 +1,19 @@
 package pl.smarthouse.ventmodule.service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.enums.FunctionType;
 import pl.smarthouse.ventmodule.exceptions.InvalidZoneOperationException;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
-import pl.smarthouse.ventmodule.model.dto.ZoneDto;
-import reactor.core.publisher.Flux;
+import pl.smarthouse.ventmodule.utils.ModelMapper;
 import reactor.core.publisher.Mono;
-
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +28,6 @@ public class ZoneService {
   private final int ZONE_OUTDATED_IN_MINUTES = 2;
 
   private final VentModuleService ventModuleService;
-  private final ModelMapper modelMapper = new ModelMapper();
 
   public Mono<ZoneDto> setZoneOperation(
       final ZoneName zoneName, final Operation operation, final int requestPower) {
@@ -46,23 +44,49 @@ public class ZoneService {
               zoneDao.setOperation(operation);
               return Mono.just(zoneDao);
             })
-        .map(zoneDao -> modelMapper.map(zoneDao, ZoneDto.class));
+        .map(ModelMapper::toZoneDto);
   }
 
-  public Flux<ZoneDao> checkIfZonesOutdated() {
+  public Mono<HashMap<ZoneName, ZoneDto>> getActiveZones() {
     return ventModuleService
-        .getAllZonesWithZoneNames()
-        .flatMap(
-            tuple -> {
-              final ZoneName zoneName = tuple.getT1();
-              final ZoneDao zoneDao = tuple.getT2();
-              if (LocalDateTime.now()
-                  .isAfter(zoneDao.getLastUpdate().plusMinutes(ZONE_OUTDATED_IN_MINUTES))) {
-                log.warn(LOG_RESET_ZONE, zoneName, ZONE_OUTDATED_IN_MINUTES);
-                return resetZone(zoneDao);
-              }
-              return Mono.empty();
+        .getZonesFullData()
+        .map(
+            zoneNameZoneDaoHashMap -> {
+              final HashMap<ZoneName, ZoneDto> resultHashMap = new HashMap<>();
+              zoneNameZoneDaoHashMap.forEach(
+                  (zoneName, zoneDao) -> {
+                    if (!Operation.STANDBY.equals(zoneDao.getOperation())) {
+                      resultHashMap.put(zoneName, ModelMapper.toZoneDto(zoneDao));
+                    }
+                  });
+              return resultHashMap;
             });
+  }
+
+  public Mono<ZoneDto> checkIfZonesOutdated() {
+    return ventModuleService
+        .getZonesFullData()
+        .flatMap(
+            zoneDaoHashMap -> {
+              final HashMap<ZoneName, ZoneDao> outdatedZoneDaos = new HashMap<>();
+              zoneDaoHashMap.forEach(
+                  (zoneName, zoneDao) -> {
+                    if (LocalDateTime.now()
+                        .isAfter(zoneDao.getLastUpdate().plusMinutes(ZONE_OUTDATED_IN_MINUTES))) {
+                      log.warn(LOG_RESET_ZONE, zoneName, ZONE_OUTDATED_IN_MINUTES);
+                      outdatedZoneDaos.put(zoneName, zoneDao);
+                    }
+                  });
+              return Mono.just(outdatedZoneDaos);
+            })
+        .flatMap(
+            outdatedZoneDaos ->
+                outdatedZoneDaos.values().stream()
+                    .map(Mono::just)
+                    .findFirst()
+                    .orElseGet(Mono::empty))
+        .flatMap(zoneDao -> resetZone(zoneDao))
+        .map(zoneDao -> ModelMapper.toZoneDto(zoneDao));
   }
 
   private void validateRequest(
@@ -80,7 +104,11 @@ public class ZoneService {
     }
     if (FunctionType.OUTLET.equals(zoneDao.getFunctionType())) {
       final List<Operation> allowedOperationList =
-          List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_EXCHANGE);
+          List.of(
+              Operation.COOLING,
+              Operation.HEATING,
+              Operation.AIR_CONDITION,
+              Operation.AIR_EXCHANGE);
       if (!allowedOperationList.contains(operation)) {
         throw new InvalidZoneOperationException(
             String.format(

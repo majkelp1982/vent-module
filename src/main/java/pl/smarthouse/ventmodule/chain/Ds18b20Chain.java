@@ -1,5 +1,8 @@
 package pl.smarthouse.ventmodule.chain;
 
+import static org.springframework.data.util.Predicates.negate;
+import static pl.smarthouse.ventmodule.properties.ForcedAirSystemExchangerProperties.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.smartchain.model.core.Chain;
@@ -11,9 +14,6 @@ import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20CommandType;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Utils;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
 import pl.smarthouse.ventmodule.service.VentModuleService;
-
-import static org.springframework.data.util.Predicates.negate;
-import static pl.smarthouse.ventmodule.properties.ActiveHeatingCoolingExchangerProperties.*;
 
 @Service
 public class Ds18b20Chain {
@@ -78,16 +78,16 @@ public class Ds18b20Chain {
           .map(
               ventModuleDao -> {
                 ventModuleDao
-                    .getActiveHeatingCoolingExchanger()
+                    .getForcedAirSystemExchanger()
                     .setWatterIn(airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_IN));
                 ventModuleDao
-                    .getActiveHeatingCoolingExchanger()
+                    .getForcedAirSystemExchanger()
                     .setWatterOut(airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_OUT));
                 ventModuleDao
-                    .getActiveHeatingCoolingExchanger()
+                    .getForcedAirSystemExchanger()
                     .setAirIn(airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_IN));
                 ventModuleDao
-                    .getActiveHeatingCoolingExchanger()
+                    .getForcedAirSystemExchanger()
                     .setAirOut(airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_OUT));
                 return ventModuleDao;
               })

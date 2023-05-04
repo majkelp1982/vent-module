@@ -1,12 +1,11 @@
 package pl.smarthouse.ventmodule.service;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.ventmodule.enums.FunctionType;
 import reactor.core.publisher.Mono;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +36,7 @@ public class FansService {
                   break;
                 case COOLING:
                 case HEATING:
+                case AIR_CONDITION:
                   addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
                   break;
               }

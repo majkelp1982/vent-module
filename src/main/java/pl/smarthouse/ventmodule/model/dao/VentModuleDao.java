@@ -1,23 +1,25 @@
 package pl.smarthouse.ventmodule.model.dao;
 
-import lombok.Builder;
+import java.util.HashMap;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
+import org.springframework.data.annotation.Transient;
+import pl.smarthouse.sharedobjects.dao.ModuleDao;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
-import pl.smarthouse.smartmodule.model.actors.type.pin.PinResponse;
-import pl.smarthouse.ventmodule.model.core.ActiveHeatingCoolingExchanger;
 import pl.smarthouse.ventmodule.model.core.AirExchanger;
 import pl.smarthouse.ventmodule.model.core.Fans;
+import pl.smarthouse.ventmodule.model.core.ForcedAirSystemExchanger;
 import pl.smarthouse.ventmodule.model.core.Throttle;
 
-import java.util.HashMap;
-
 @Data
-@Builder
-public class VentModuleDao {
-  private final HashMap<ZoneName, ZoneDao> zoneDaoHashMap;
+@SuperBuilder
+public class VentModuleDao extends ModuleDao {
+  @Transient private final HashMap<ZoneName, ZoneDao> zoneDaoHashMap;
   private final Fans fans;
   private final Throttle intakeThrottle;
   private final AirExchanger airExchanger;
-  private final ActiveHeatingCoolingExchanger activeHeatingCoolingExchanger;
-  private PinResponse circuitPump;
+  private final ForcedAirSystemExchanger forcedAirSystemExchanger;
+  private State circuitPump;
+  private State airCondition;
 }

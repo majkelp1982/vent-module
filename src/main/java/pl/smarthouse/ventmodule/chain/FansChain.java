@@ -1,5 +1,10 @@
 package pl.smarthouse.ventmodule.chain;
 
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_INLET;
+import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_OUTLET;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +18,6 @@ import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
 import pl.smarthouse.ventmodule.model.core.Fan;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 import reactor.core.publisher.Mono;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Predicate;
-
-import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_INLET;
-import static pl.smarthouse.ventmodule.properties.FanProperties.FAN_OUTLET;
 
 @Service
 @Slf4j
@@ -54,7 +53,7 @@ public class FansChain {
   private Step waitForFanStateChangeAndSetGoalPower() {
     return Step.builder()
         .conditionDescription("Wait for fans state change")
-        .condition(checkIfFansGoalPowerIfDifferentThenCurrent())
+        .condition(checkIfFansGoalPowerIfDifferentThenCurrent().or(PredicateUtils.delaySeconds(30)))
         .stepDescription("Set goal power to inlet and outlet fans")
         .action(setGoalPower())
         .build();
@@ -120,7 +119,7 @@ public class FansChain {
 
   private int calculateDutyCycle(final int power) {
     // Power parameter is from 0 to 100
-    // return value is from 0 to 255
-    return ((int) (255 * (power / 100.00)));
+    // return value is from 255 to 0
+    return (255 - ((int) (255 * (power / 100.00))));
   }
 }
