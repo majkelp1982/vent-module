@@ -37,9 +37,9 @@ public class TempOldComfortModuleService {
     comfortZoneHashMap.put(ZoneName.PRALNIA, new TempComfortZone(true));
     comfortZoneHashMap.put(ZoneName.LAZ_DOL, new TempComfortZone(true));
     comfortZoneHashMap.put(ZoneName.RODZICE, new TempComfortZone(true));
-    comfortZoneHashMap.put(ZoneName.NATALIA, new TempComfortZone(true));
+    comfortZoneHashMap.put(ZoneName.NATALIA, new TempComfortZone(false));
     comfortZoneHashMap.put(ZoneName.KAROLINA, new TempComfortZone(true));
-    comfortZoneHashMap.put(ZoneName.LAZ_GORA, new TempComfortZone(true));
+    comfortZoneHashMap.put(ZoneName.LAZ_GORA, new TempComfortZone(false));
     this.tempHysteresisService = tempHysteresisService;
   }
 
