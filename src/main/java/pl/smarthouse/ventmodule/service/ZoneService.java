@@ -105,8 +105,8 @@ public class ZoneService {
     if (FunctionType.OUTLET.equals(zoneDao.getFunctionType())) {
       final List<Operation> allowedOperationList =
           List.of(
-              Operation.COOLING,
-              Operation.HEATING,
+              Operation.AIR_COOLING,
+              Operation.AIR_HEATING,
               Operation.AIR_CONDITION,
               Operation.AIR_EXCHANGE);
       if (!allowedOperationList.contains(operation)) {

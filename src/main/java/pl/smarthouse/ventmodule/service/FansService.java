@@ -34,8 +34,8 @@ public class FansService {
                 case HUMIDITY_ALERT:
                   addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
                   break;
-                case COOLING:
-                case HEATING:
+                case AIR_COOLING:
+                case AIR_HEATING:
                 case AIR_CONDITION:
                   addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
                   break;

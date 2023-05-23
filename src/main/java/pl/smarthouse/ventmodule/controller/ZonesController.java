@@ -30,9 +30,9 @@ public class ZonesController {
     return zoneService.getActiveZones();
   }
 
-  @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "Illegal arguments")
   @ExceptionHandler(InvalidZoneOperationException.class)
-  public void InvalidZoneOperationExceptionHandler() {
-    // TODO return exception message
+  @ResponseStatus(value = HttpStatus.NOT_ACCEPTABLE)
+  public Mono<String> invalidZoneOperationExceptionHandler(final Exception exception) {
+    return Mono.just(exception.getMessage());
   }
 }

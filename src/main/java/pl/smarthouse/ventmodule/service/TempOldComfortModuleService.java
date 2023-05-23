@@ -90,13 +90,13 @@ public class TempOldComfortModuleService {
               }
 
               final List<Operation> operationList =
-                  List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_CONDITION);
+                  List.of(Operation.AIR_COOLING, Operation.AIR_HEATING, Operation.AIR_CONDITION);
               if (!FunctionType.OUTLET.equals(zoneDao.getFunctionType())
                   && operationList.contains(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
               }
               final List<Operation> forcedAirOperations =
-                  List.of(Operation.COOLING, Operation.HEATING, Operation.AIR_CONDITION);
+                  List.of(Operation.AIR_COOLING, Operation.AIR_HEATING, Operation.AIR_CONDITION);
               if (forcedAirOperations.contains(calculatedOperation)
                   && !tempComfortZone.isForcedAirSystemEnabled()) {
                 return Mono.just(Operation.STANDBY);
@@ -139,7 +139,7 @@ public class TempOldComfortModuleService {
         return 75;
       }
     }
-    final List operationList = List.of(Operation.HEATING, Operation.COOLING);
+    final List operationList = List.of(Operation.AIR_HEATING, Operation.AIR_COOLING);
     if (operationList.contains(operation)) {
       return 30;
     }

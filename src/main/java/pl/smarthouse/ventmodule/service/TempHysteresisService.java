@@ -34,14 +34,14 @@ public class TempHysteresisService {
     }
 
     if (deltaTemp <= heatingThresholdLow) {
-      resultOperation = Operation.HEATING;
+      resultOperation = Operation.AIR_HEATING;
     }
 
-    if (Operation.HEATING.equals(currentOperation)) {
+    if (Operation.AIR_HEATING.equals(currentOperation)) {
       if (deltaTemp > heatingThresholdHigh) {
         resultOperation = Operation.STANDBY;
       } else {
-        return Operation.HEATING;
+        return Operation.AIR_HEATING;
       }
     }
 
@@ -58,15 +58,15 @@ public class TempHysteresisService {
     }
 
     if ((deltaTemp >= coolingThresholdHigh) && !Operation.AIR_CONDITION.equals(resultOperation)) {
-      resultOperation = Operation.COOLING;
+      resultOperation = Operation.AIR_COOLING;
     }
 
-    if (Operation.COOLING.equals(currentOperation)
+    if (Operation.AIR_COOLING.equals(currentOperation)
         && !Operation.AIR_CONDITION.equals(resultOperation)) {
       if (deltaTemp < coolingThresholdLow) {
         resultOperation = Operation.STANDBY;
       } else {
-        return Operation.COOLING;
+        return Operation.AIR_COOLING;
       }
     }
 

@@ -29,7 +29,8 @@ public class ThrottlesService {
             })
         .filter(
             zoneDao ->
-                List.of(Operation.COOLING, Operation.HEATING).contains(zoneDao.getOperation()))
+                List.of(Operation.AIR_COOLING, Operation.AIR_HEATING)
+                    .contains(zoneDao.getOperation()))
         .collectList()
         .flatMap(
             zoneDaoList -> {

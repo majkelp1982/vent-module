@@ -25,9 +25,9 @@ class TempHysteresisServiceTest {
     assertEquals(Operation.STANDBY, currentOperation);
 
     // HUMIDITY TEST PART II
-    currentOperation = tempHysteresisService.update(Operation.HEATING, 75, -2.5);
+    currentOperation = tempHysteresisService.update(Operation.AIR_HEATING, 75, -2.5);
     assertEquals(Operation.HUMIDITY_ALERT, currentOperation);
-    currentOperation = tempHysteresisService.update(Operation.COOLING, 75, 1.5);
+    currentOperation = tempHysteresisService.update(Operation.AIR_COOLING, 75, 1.5);
     assertEquals(Operation.HUMIDITY_ALERT, currentOperation);
     currentOperation = tempHysteresisService.update(Operation.AIR_CONDITION, 75, 3.1);
     assertEquals(Operation.HUMIDITY_ALERT, currentOperation);
@@ -37,10 +37,10 @@ class TempHysteresisServiceTest {
     assertEquals(Operation.STANDBY, currentOperation);
 
     currentOperation = tempHysteresisService.update(currentOperation, 50, -2.5);
-    assertEquals(Operation.HEATING, currentOperation);
+    assertEquals(Operation.AIR_HEATING, currentOperation);
 
     currentOperation = tempHysteresisService.update(currentOperation, 50, -1.5);
-    assertEquals(Operation.HEATING, currentOperation);
+    assertEquals(Operation.AIR_HEATING, currentOperation);
 
     currentOperation = tempHysteresisService.update(currentOperation, 50, -1.4);
     assertEquals(Operation.STANDBY, currentOperation);
@@ -50,17 +50,17 @@ class TempHysteresisServiceTest {
     assertEquals(Operation.STANDBY, currentOperation);
 
     currentOperation = tempHysteresisService.update(currentOperation, 50, 1.5);
-    assertEquals(Operation.COOLING, currentOperation);
+    assertEquals(Operation.AIR_COOLING, currentOperation);
 
     currentOperation = tempHysteresisService.update(currentOperation, 50, 1.0);
-    assertEquals(Operation.COOLING, currentOperation);
+    assertEquals(Operation.AIR_COOLING, currentOperation);
 
     currentOperation = tempHysteresisService.update(currentOperation, 50, 0.9);
     assertEquals(Operation.STANDBY, currentOperation);
 
     // AIR CONDITION + COOLING TEST
     currentOperation = tempHysteresisService.update(currentOperation, 50, 1.9);
-    assertEquals(Operation.COOLING, currentOperation);
+    assertEquals(Operation.AIR_COOLING, currentOperation);
 
     currentOperation = tempHysteresisService.update(currentOperation, 50, 2.0);
     assertEquals(Operation.AIR_CONDITION, currentOperation);

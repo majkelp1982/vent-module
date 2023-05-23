@@ -66,8 +66,8 @@ public class PumpChain {
           .map(ZoneDao::getOperation)
           .filter(
               operation ->
-                  (Operation.HEATING.equals(operation)
-                      || Operation.COOLING.equals(operation)
+                  (Operation.AIR_HEATING.equals(operation)
+                      || Operation.AIR_COOLING.equals(operation)
                       || Operation.AIR_CONDITION.equals(operation)))
           .collectList()
           .map(
