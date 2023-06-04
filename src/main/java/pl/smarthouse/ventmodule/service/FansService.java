@@ -24,11 +24,11 @@ public class FansService {
               final int requiredPower = zoneDao.getRequiredPower();
               switch (zoneDao.getOperation()) {
                 case AIR_EXCHANGE:
-                  if (FunctionType.INLET.equals(zoneDao.getFunctionType())) {
-                    addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
+                  if (FunctionType.AIR_EXTRACT.equals(zoneDao.getFunctionType())) {
+                    addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
                   } else {
 
-                    addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
+                    addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
                   }
                   break;
                 case HUMIDITY_ALERT:

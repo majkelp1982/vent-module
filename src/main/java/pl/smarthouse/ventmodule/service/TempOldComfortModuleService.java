@@ -84,19 +84,17 @@ public class TempOldComfortModuleService {
         .getZone(zoneName)
         .flatMap(
             zoneDao -> {
-              if (!FunctionType.INLET.equals(zoneDao.getFunctionType())
+              if (!FunctionType.AIR_EXTRACT.equals(zoneDao.getFunctionType())
                   && Operation.HUMIDITY_ALERT.equals(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
               }
 
-              final List<Operation> operationList =
-                  List.of(Operation.AIR_COOLING, Operation.AIR_HEATING, Operation.AIR_CONDITION);
-              if (!FunctionType.OUTLET.equals(zoneDao.getFunctionType())
-                  && operationList.contains(calculatedOperation)) {
+              final List<Operation> forcedAirOperations =
+                      List.of(Operation.AIR_COOLING, Operation.AIR_HEATING, Operation.AIR_CONDITION);
+              if (!FunctionType.AIR_SUPPLY.equals(zoneDao.getFunctionType())
+                  && forcedAirOperations.contains(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
               }
-              final List<Operation> forcedAirOperations =
-                  List.of(Operation.AIR_COOLING, Operation.AIR_HEATING, Operation.AIR_CONDITION);
               if (forcedAirOperations.contains(calculatedOperation)
                   && !tempComfortZone.isForcedAirSystemEnabled()) {
                 return Mono.just(Operation.STANDBY);

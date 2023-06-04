@@ -102,7 +102,7 @@ public class ZoneService {
       throw new InvalidZoneOperationException(
           String.format(ERROR_POWER_REQUIRED, zoneName, operation));
     }
-    if (FunctionType.OUTLET.equals(zoneDao.getFunctionType())) {
+    if (FunctionType.AIR_SUPPLY.equals(zoneDao.getFunctionType())) {
       final List<Operation> allowedOperationList =
           List.of(
               Operation.AIR_COOLING,
@@ -119,7 +119,7 @@ public class ZoneService {
                 allowedOperationList));
       }
     }
-    if (FunctionType.INLET.equals(zoneDao.getFunctionType())) {
+    if (FunctionType.AIR_EXTRACT.equals(zoneDao.getFunctionType())) {
       final List<Operation> allowedOperationList =
           List.of(Operation.HUMIDITY_ALERT, Operation.AIR_EXCHANGE);
       if (!allowedOperationList.contains(operation)) {
