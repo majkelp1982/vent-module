@@ -90,7 +90,7 @@ public class TempOldComfortModuleService {
               }
 
               final List<Operation> forcedAirOperations =
-                      List.of(Operation.AIR_COOLING, Operation.AIR_HEATING, Operation.AIR_CONDITION);
+                  List.of(Operation.AIR_COOLING, Operation.AIR_HEATING, Operation.AIR_CONDITION);
               if (!FunctionType.AIR_SUPPLY.equals(zoneDao.getFunctionType())
                   && forcedAirOperations.contains(calculatedOperation)) {
                 return Mono.just(Operation.STANDBY);
