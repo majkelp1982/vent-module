@@ -73,12 +73,12 @@ public class ModelMapper {
     return IntakeThrottleDto.builder()
         .currentPosition(
             intakeThrottle.getCurrentPosition() == intakeThrottle.getOpenPosition()
-                ? IntakeThrottleState.INSIDE
-                : IntakeThrottleState.OUTSIDE)
+                ? IntakeThrottleState.OUTSIDE
+                : IntakeThrottleState.INSIDE)
         .goalPosition(
             intakeThrottle.getGoalPosition() == intakeThrottle.getOpenPosition()
-                ? IntakeThrottleState.INSIDE
-                : IntakeThrottleState.OUTSIDE)
+                ? IntakeThrottleState.OUTSIDE
+                : IntakeThrottleState.INSIDE)
         .build();
   }
 
