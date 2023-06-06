@@ -11,9 +11,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.WebClient;
 import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
-import pl.smarthouse.ventmodule.enums.FunctionType;
 import pl.smarthouse.ventmodule.model.core.TempComfortZone;
 import reactor.core.publisher.Mono;
 

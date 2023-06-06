@@ -5,8 +5,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 import pl.smarthouse.sharedobjects.enums.Operation;
-import pl.smarthouse.ventmodule.enums.FunctionType;
 import pl.smarthouse.ventmodule.model.core.Throttle;
 
 @Getter
