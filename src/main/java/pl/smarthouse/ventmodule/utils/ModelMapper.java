@@ -107,6 +107,7 @@ public class ModelMapper {
   public ZoneDto toZoneDto(final ZoneDao zoneDao) {
     return ZoneDto.builder()
         .lastUpdate(zoneDao.getLastUpdate())
+        .functionType(zoneDao.getFunctionType())
         .operation(zoneDao.getOperation())
         .throttle(toThrottleDto(zoneDao.getThrottle()))
         .requiredPower(zoneDao.getRequiredPower())
