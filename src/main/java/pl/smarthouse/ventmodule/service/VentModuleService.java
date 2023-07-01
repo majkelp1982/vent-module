@@ -30,6 +30,10 @@ public class VentModuleService {
     return Mono.just(ventModuleConfiguration.getVentModuleDao());
   }
 
+  public Mono<String> getModuleName() {
+    return Mono.just(ventModuleConfiguration.getVentModuleDao().getModuleName());
+  }
+
   public Mono<ZoneDao> getZone(final ZoneName zoneName) {
     return Mono.justOrEmpty(
         ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().get(zoneName));
