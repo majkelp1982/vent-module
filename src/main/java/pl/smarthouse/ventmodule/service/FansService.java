@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
+import pl.smarthouse.ventmodule.utils.FanUtils;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 public class FansService {
 
   private final VentModuleService ventModuleService;
+  private final VentModuleParamsService ventModuleParamsService;
 
   public Mono<Void> setFansRequiredPower() {
     final AtomicInteger inletRequiredGoalPower = new AtomicInteger(0);
@@ -25,19 +27,19 @@ public class FansService {
               switch (zoneDao.getOperation()) {
                 case AIR_EXCHANGE:
                   if (FunctionType.AIR_EXTRACT.equals(zoneDao.getFunctionType())) {
-                    addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
+                    FanUtils.addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
                   } else {
 
-                    addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
+                    FanUtils.addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
                   }
                   break;
                 case HUMIDITY_ALERT:
-                  addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
+                  FanUtils.addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
                   break;
                 case AIR_COOLING:
                 case AIR_HEATING:
                 case AIR_CONDITION:
-                  addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
+                  FanUtils.addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
                   break;
               }
               return zoneDao;
@@ -51,27 +53,28 @@ public class FansService {
   private Mono<Void> setRequiredPower(
       final int inletRequiredGoalPower, final int outletRequiredGoalPower) {
     return ventModuleService
-        .getInletFan()
-        .map(
-            inletFan -> {
-              inletFan.setGoalSpeed(inletRequiredGoalPower);
-              return inletFan;
-            })
-        .flatMap(ignoreFan -> ventModuleService.getOutletFan())
-        .map(
-            outletFan -> {
-              outletFan.setGoalSpeed(outletRequiredGoalPower);
-              return outletFan;
-            })
-        .flatMap(ignoreFan -> Mono.empty());
-  }
+        .getFans()
+        .flatMap(
+            fans ->
+                ventModuleParamsService
+                    .getParams()
+                    .map(
+                        ventModuleParamsDto -> {
+                          fans.getInlet()
+                              .setGoalSpeed(
+                                  FanUtils.validateRequiredGoalPower(
+                                      ventModuleParamsDto,
+                                      inletRequiredGoalPower,
+                                      ventModuleParamsDto.getInletFanNightHoursMaxPower()));
 
-  private void addAndValidateRequiredPower(final AtomicInteger goalPower, final int value) {
-    goalPower.addAndGet(value);
-    if (goalPower.get() > 100) {
-      goalPower.set(100);
-    } else if (goalPower.get() < 0) {
-      goalPower.set(0);
-    }
+                          fans.getOutlet()
+                              .setGoalSpeed(
+                                  FanUtils.validateRequiredGoalPower(
+                                      ventModuleParamsDto,
+                                      outletRequiredGoalPower,
+                                      ventModuleParamsDto.getOutletFanNightHoursMaxPower()));
+                          return fans;
+                        })
+                    .then());
   }
 }

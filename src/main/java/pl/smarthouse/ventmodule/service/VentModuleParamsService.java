@@ -31,7 +31,9 @@ public class VentModuleParamsService {
   }
 
   private Mono<String> getParamTableName() {
-    return ventModuleService.getModuleName().map(moduleName -> moduleName + "_settings");
+    return ventModuleService
+        .getModuleName()
+        .map(moduleName -> moduleName.toLowerCase() + "_settings");
   }
 
   public Mono<VentModuleParamsDto> getParams() {

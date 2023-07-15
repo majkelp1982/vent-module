@@ -19,6 +19,6 @@ public class VentModuleParamsDao {
   private boolean nightHoursEnabled;
 
   private TimeRange nightHours;
-  private int inletFanNightHoursMaxSpeed;
-  private int outletFanNightHoursMaxSpeed;
+  private int inletFanNightHoursMaxPower;
+  private int outletFanNightHoursMaxPower;
 }

@@ -18,10 +18,10 @@ class TempHysteresisServiceTest {
     currentOperation = tempHysteresisService.update(currentOperation, 75, 0);
     assertEquals(Operation.HUMIDITY_ALERT, currentOperation);
 
-    currentOperation = tempHysteresisService.update(currentOperation, 70, 0);
+    currentOperation = tempHysteresisService.update(currentOperation, 60, 0);
     assertEquals(Operation.HUMIDITY_ALERT, currentOperation);
 
-    currentOperation = tempHysteresisService.update(currentOperation, 69, 0);
+    currentOperation = tempHysteresisService.update(currentOperation, 59, 0);
     assertEquals(Operation.STANDBY, currentOperation);
 
     // HUMIDITY TEST PART II
