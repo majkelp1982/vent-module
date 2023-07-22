@@ -24,8 +24,6 @@ public class ThrottleProperties {
   public static final int PRALNIA_CLOSE_POSITION = 1960;
   public static final int WARSZTAT_OPEN_POSITION = 960;
   public static final int WARSZTAT_CLOSE_POSITION = 1960;
-  public static final int RODZICE_OPEN_POSITION = 960;
-  public static final int RODZICE_CLOSE_POSITION = 1960;
   public static final int GARDEROBA_OPEN_POSITION = 960;
   public static final int GARDEROBA_CLOSE_POSITION = 1960;
   public static final int NATALIA_OPEN_POSITION = 960;
@@ -35,4 +33,6 @@ public class ThrottleProperties {
   // Settings checked
   public static final int KAROLINA_OPEN_POSITION = 910;
   public static final int KAROLINA_CLOSE_POSITION = 1920;
+  public static final int RODZICE_OPEN_POSITION = 910;
+  public static final int RODZICE_CLOSE_POSITION = 2000;
 }
