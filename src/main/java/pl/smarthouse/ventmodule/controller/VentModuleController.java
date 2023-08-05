@@ -9,13 +9,13 @@ import pl.smarthouse.ventmodule.service.VentModuleService;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/vent")
+@RequestMapping()
 @RequiredArgsConstructor
 public class VentModuleController {
   private final VentModuleService ventModuleService;
   private final VentModuleParamsService ventModuleParamsService;
 
-  @GetMapping()
+  @GetMapping("/vent")
   public Mono<VentModuleDto> getVentModule() {
     return ventModuleService.getVentModule();
   }
