@@ -42,22 +42,22 @@ public class PumpChain {
   private Chain createChain() {
     final Chain chain = new Chain("Circuit pump");
     // Wait for pump request change and set
-    chain.addStep(waitForRequestStateChangeAndSet());
+    chain.addStep(waitForRequestStateChangeOr1MinuteThanSet());
     // Wait for response and after set NO_ACTION
-    chain.addStep(waitForResponseAndSetNoActionStep());
+    chain.addStep(waitForResponseThanSetNoActionStep());
     return chain;
   }
 
-  private Step waitForRequestStateChangeAndSet() {
+  private Step waitForRequestStateChangeOr1MinuteThanSet() {
     return Step.builder()
-        .conditionDescription("Wait for pump request change")
-        .condition(checkIfRequestStateChange())
+        .conditionDescription("Wait for pump request change or one minute delay")
+        .condition(checkIfRequestStateChangeOr1MinuteDelay())
         .stepDescription("Set pump")
         .action(setPump())
         .build();
   }
 
-  private Predicate<Step> checkIfRequestStateChange() {
+  private Predicate<Step> checkIfRequestStateChangeOr1MinuteDelay() {
     return step -> {
       final AtomicBoolean result = new AtomicBoolean(false);
       goalState = PinState.HIGH;
@@ -73,13 +73,15 @@ public class PumpChain {
           .map(
               operationsList -> {
                 if ((Objects.isNull(pump.getResponse())
-                        || (PinState.HIGH.equals(pump.getResponse().getPinState())))
+                        || (PinState.HIGH.equals(pump.getResponse().getPinState()))
+                        || PredicateUtils.delaySeconds(60).test(step))
                     && !operationsList.isEmpty()) {
                   result.set(true);
                   goalState = PinState.LOW;
                 }
                 if ((Objects.isNull(pump.getResponse())
-                        || PinState.LOW.equals(pump.getResponse().getPinState()))
+                        || PinState.LOW.equals(pump.getResponse().getPinState())
+                        || PredicateUtils.delaySeconds(60).test(step))
                     && operationsList.isEmpty()) {
                   result.set(true);
                   goalState = PinState.HIGH;
@@ -99,7 +101,7 @@ public class PumpChain {
     };
   }
 
-  private Step waitForResponseAndSetNoActionStep() {
+  private Step waitForResponseThanSetNoActionStep() {
     return Step.builder()
         .conditionDescription("Wait for response")
         .condition(waitForResponse())
