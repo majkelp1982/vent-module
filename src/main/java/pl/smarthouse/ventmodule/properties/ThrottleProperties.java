@@ -14,8 +14,6 @@ public class ThrottleProperties {
   public static final int SALON_CLOSE_POSITION = 1960;
   public static final int KUCHNIA_OPEN_POSITION = 960;
   public static final int KUCHNIA_CLOSE_POSITION = 1960;
-  public static final int BIURO_OPEN_POSITION = 960;
-  public static final int BIURO_CLOSE_POSITION = 1960;
   public static final int LAZ_DOL_OPEN_POSITION = 960;
   public static final int LAZ_DOL_CLOSE_POSITION = 1960;
   public static final int PRZEDPOKOJ_OPEN_POSITION = 960;
@@ -35,4 +33,6 @@ public class ThrottleProperties {
   public static final int RODZICE_CLOSE_POSITION = 2000;
   public static final int NATALIA_OPEN_POSITION = 1100;
   public static final int NATALIA_CLOSE_POSITION = 2100;
+  public static final int BIURO_OPEN_POSITION = 960;
+  public static final int BIURO_CLOSE_POSITION = 1960;
 }
