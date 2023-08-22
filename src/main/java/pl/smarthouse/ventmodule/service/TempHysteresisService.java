@@ -9,8 +9,8 @@ import pl.smarthouse.sharedobjects.enums.Operation;
 @Setter
 @Getter
 public class TempHysteresisService {
-  private int humidityThresholdLow = 60;
-  private int humidityThresholdHigh = 75;
+  private int humidityThresholdLow = 75;
+  private int humidityThresholdHigh = 85;
   private double heatingThresholdLow = -2.5;
   private double heatingThresholdHigh = -1.5;
   private double coolingThresholdHigh = 1.5;
