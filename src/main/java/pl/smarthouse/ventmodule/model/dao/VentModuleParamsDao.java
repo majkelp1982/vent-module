@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRange;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.IntakeThrottleMode;
 
 @Data
 @Builder
@@ -17,6 +18,7 @@ public class VentModuleParamsDao {
   private boolean airCoolingEnabled;
   private boolean airConditionEnabled;
   private boolean nightHoursEnabled;
+  private IntakeThrottleMode intakeThrottleMode;
 
   private TimeRange nightHours;
   private int inletFanNightHoursMaxPower;

@@ -1,6 +1,5 @@
 package pl.smarthouse.ventmodule.service;
 
-import java.time.Duration;
 import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +43,7 @@ public class VentModuleParamsService {
                     .getParams(paramTableName)
                     .doOnNext(
                         ventModuleParamsDao ->
-                            log.info("Successfully retrieve params: {}", ventModuleParamsDao))
+                            log.debug("Successfully retrieve params: {}", ventModuleParamsDao))
                     .map(
                         ventModuleParamsDao ->
                             modelMapper.map(ventModuleParamsDao, VentModuleParamsDto.class))
@@ -62,7 +61,6 @@ public class VentModuleParamsService {
                                 throwable))
                     .doOnSubscribe(
                         subscription ->
-                            log.info("Get module params from collection: {}", paramTableName)))
-        .cache(Duration.ofMinutes(1));
+                            log.debug("Get module params from collection: {}", paramTableName)));
   }
 }

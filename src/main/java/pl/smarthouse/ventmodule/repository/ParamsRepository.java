@@ -1,5 +1,6 @@
 package pl.smarthouse.ventmodule.repository;
 
+import java.time.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
@@ -20,6 +21,9 @@ public class ParamsRepository {
   }
 
   public Mono<VentModuleParamsDao> getParams(final String paramTableName) {
-    return reactiveMongoTemplate.findAll(VentModuleParamsDao.class, paramTableName).last();
+    return reactiveMongoTemplate
+        .findAll(VentModuleParamsDao.class, paramTableName)
+        .last()
+        .cache(Duration.ofMinutes(1));
   }
 }
