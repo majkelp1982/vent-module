@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 import pl.smarthouse.sharedobjects.enums.Operation;
@@ -28,22 +29,28 @@ public class ZoneService {
   private final int ZONE_OUTDATED_IN_MINUTES = 2;
 
   private final VentModuleService ventModuleService;
+  private final VentModuleParamsService ventModuleParamsService;
 
   public Mono<ZoneDto> setZoneOperation(
       final ZoneName zoneName, final Operation operation, final int requestPower) {
-    return ventModuleService
-        .getZone(zoneName)
+    return ventModuleParamsService
+        .getParams()
+        .map(ventModuleParamsDto -> recalculateOperation(ventModuleParamsDto, operation))
         .flatMap(
-            zoneDao -> {
-              if (!Operation.STANDBY.equals(operation)) {
-                validateRequest(zoneName, zoneDao, operation, requestPower);
-                zoneDao.setRequiredPower(requestPower);
-              } else {
-                zoneDao.setRequiredPower(0);
-              }
-              zoneDao.setOperation(operation);
-              return Mono.just(zoneDao);
-            })
+            recalculatedOperation ->
+                ventModuleService
+                    .getZone(zoneName)
+                    .flatMap(
+                        zoneDao -> {
+                          if (!Operation.STANDBY.equals(recalculatedOperation)) {
+                            validateRequest(zoneName, zoneDao, recalculatedOperation, requestPower);
+                            zoneDao.setRequiredPower(requestPower);
+                          } else {
+                            zoneDao.setRequiredPower(0);
+                          }
+                          zoneDao.setOperation(recalculatedOperation);
+                          return Mono.just(zoneDao);
+                        }))
         .map(ModelMapper::toZoneDto);
   }
 
@@ -87,6 +94,32 @@ public class ZoneService {
                     .orElseGet(Mono::empty))
         .flatMap(zoneDao -> resetZone(zoneDao))
         .map(zoneDao -> ModelMapper.toZoneDto(zoneDao));
+  }
+
+  private Operation recalculateOperation(
+      final VentModuleParamsDto ventModuleParamsDto, final Operation operation) {
+    if (!ventModuleParamsDto.isHumidityAlertEnabled()
+        && Operation.HUMIDITY_ALERT.equals(operation)) {
+      log.info("Operation overwritten to STANDBY. HUMIDITY_ALERT not enabled");
+      return Operation.STANDBY;
+    }
+    if (!ventModuleParamsDto.isAirExchangeEnabled() && Operation.AIR_EXCHANGE.equals(operation)) {
+      log.info("Operation overwritten to STANDBY. AIR_EXCHANGE not enabled");
+      return Operation.STANDBY;
+    }
+    if (!ventModuleParamsDto.isAirHeatingEnabled() && Operation.AIR_HEATING.equals(operation)) {
+      log.info("Operation overwritten to STANDBY. AIR_HEATING not enabled");
+      return Operation.STANDBY;
+    }
+    if (!ventModuleParamsDto.isAirCoolingEnabled() && Operation.AIR_COOLING.equals(operation)) {
+      log.info("Operation overwritten to STANDBY. AIR_COOLING not enabled");
+      return Operation.STANDBY;
+    }
+    if (!ventModuleParamsDto.isAirConditionEnabled() && Operation.AIR_CONDITION.equals(operation)) {
+      log.info("Operation overwritten to STANDBY. AIR_CONDITION not enabled");
+      return Operation.STANDBY;
+    }
+    return operation;
   }
 
   private void validateRequest(

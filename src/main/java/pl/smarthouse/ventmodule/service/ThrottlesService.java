@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.IntakeThrottleMode;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.ventmodule.model.core.Throttle;
 import reactor.core.publisher.Mono;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class ThrottlesService {
   private final VentModuleService ventModuleService;
+  private final VentModuleParamsService ventModuleParamsService;
 
   public Mono<Throttle> setThrottles() {
     return ventModuleService
@@ -25,16 +27,30 @@ public class ThrottlesService {
               } else {
                 throttle.setGoalPosition(throttle.getOpenPosition());
               }
-              return zoneDao;
+              return zoneDao.getOperation();
             })
-        .filter(
-            zoneDao ->
-                List.of(Operation.AIR_COOLING, Operation.AIR_CONDITION, Operation.AIR_HEATING)
-                    .contains(zoneDao.getOperation()))
         .collectList()
+        .flatMap(this::calculateIntakeThrottlePosition);
+  }
+
+  private Mono<Throttle> calculateIntakeThrottlePosition(final List<Operation> operations) {
+    return ventModuleParamsService
+        .getParams()
         .flatMap(
-            zoneDaoList -> {
-              if (zoneDaoList.isEmpty()) {
+            ventModuleParamsDto -> {
+              final IntakeThrottleMode intakeThrottleMode =
+                  ventModuleParamsDto.getIntakeThrottleMode();
+              if (IntakeThrottleMode.FORCED_INSIDE.equals(intakeThrottleMode)) {
+                return ventModuleService
+                    .getIntakeThrottle()
+                    .flatMap(
+                        throttle -> {
+                          throttle.setGoalPosition(throttle.getClosePosition());
+                          return Mono.just(throttle);
+                        });
+              }
+
+              if (IntakeThrottleMode.FORCED_OUTSIDE.equals(intakeThrottleMode)) {
                 return ventModuleService
                     .getIntakeThrottle()
                     .flatMap(
@@ -42,12 +58,22 @@ public class ThrottlesService {
                           throttle.setGoalPosition(throttle.getOpenPosition());
                           return Mono.just(throttle);
                         });
-              } else {
+              }
+
+              if (operations.contains(Operation.AIR_HEATING)) {
                 return ventModuleService
                     .getIntakeThrottle()
                     .flatMap(
                         throttle -> {
                           throttle.setGoalPosition(throttle.getClosePosition());
+                          return Mono.just(throttle);
+                        });
+              } else {
+                return ventModuleService
+                    .getIntakeThrottle()
+                    .flatMap(
+                        throttle -> {
+                          throttle.setGoalPosition(throttle.getOpenPosition());
                           return Mono.just(throttle);
                         });
               }
