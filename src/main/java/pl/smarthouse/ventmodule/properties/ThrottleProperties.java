@@ -27,8 +27,8 @@ public class ThrottleProperties {
   public static final int LAZ_GORA_OPEN_POSITION = 960;
   public static final int LAZ_GORA_CLOSE_POSITION = 1960;
   // Settings checked
-  public static final int KAROLINA_OPEN_POSITION = 910;
-  public static final int KAROLINA_CLOSE_POSITION = 1920;
+  public static final int KAROLINA_OPEN_POSITION = 850;
+  public static final int KAROLINA_CLOSE_POSITION = 1900;
   public static final int RODZICE_OPEN_POSITION = 910;
   public static final int RODZICE_CLOSE_POSITION = 2000;
   public static final int NATALIA_OPEN_POSITION = 1100;
