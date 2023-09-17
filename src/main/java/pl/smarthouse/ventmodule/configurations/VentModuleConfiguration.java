@@ -14,6 +14,7 @@ import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
+import pl.smarthouse.sharedobjects.utils.FunctionTypeUtil;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280Response;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType;
@@ -127,84 +128,84 @@ public class VentModuleConfiguration {
     zoneDaoHashMap.put(
         SALON,
         createZone(
-            FunctionType.AIR_SUPPLY,
+            FunctionTypeUtil.determinateFunctionType(SALON),
             SALON_OPEN_POSITION,
             SALON_CLOSE_POSITION,
             WRITE_SERVO1_MICROSECONDS));
     zoneDaoHashMap.put(
         KUCHNIA,
         createZone(
-            FunctionType.AIR_EXTRACT,
+            FunctionTypeUtil.determinateFunctionType(KUCHNIA),
             KUCHNIA_OPEN_POSITION,
             KUCHNIA_CLOSE_POSITION,
             WRITE_SERVO2_MICROSECONDS));
     zoneDaoHashMap.put(
         BIURO,
         createZone(
-            FunctionType.AIR_SUPPLY,
+            FunctionTypeUtil.determinateFunctionType(BIURO),
             BIURO_OPEN_POSITION,
             BIURO_CLOSE_POSITION,
             WRITE_SERVO3_MICROSECONDS));
     zoneDaoHashMap.put(
         LAZ_DOL,
         createZone(
-            FunctionType.AIR_EXTRACT,
+            FunctionTypeUtil.determinateFunctionType(LAZ_DOL),
             LAZ_DOL_OPEN_POSITION,
             LAZ_DOL_CLOSE_POSITION,
             WRITE_SERVO4_MICROSECONDS));
     zoneDaoHashMap.put(
         PRZEDPOKOJ,
         createZone(
-            FunctionType.AIR_EXTRACT,
+            FunctionTypeUtil.determinateFunctionType(PRZEDPOKOJ),
             PRZEDPOKOJ_OPEN_POSITION,
             PRZEDPOKOJ_CLOSE_POSITION,
             WRITE_SERVO5_MICROSECONDS));
     zoneDaoHashMap.put(
         PRALNIA,
         createZone(
-            FunctionType.AIR_SUPPLY,
+            FunctionTypeUtil.determinateFunctionType(PRALNIA),
             PRALNIA_OPEN_POSITION,
             PRALNIA_CLOSE_POSITION,
             WRITE_SERVO6_MICROSECONDS));
     zoneDaoHashMap.put(
         WARSZTAT,
         createZone(
-            FunctionType.AIR_EXTRACT,
+            FunctionTypeUtil.determinateFunctionType(WARSZTAT),
             WARSZTAT_OPEN_POSITION,
             WARSZTAT_CLOSE_POSITION,
             WRITE_SERVO7_MICROSECONDS));
     zoneDaoHashMap.put(
         RODZICE,
         createZone(
-            FunctionType.AIR_SUPPLY,
+            FunctionTypeUtil.determinateFunctionType(RODZICE),
             RODZICE_OPEN_POSITION,
             RODZICE_CLOSE_POSITION,
             WRITE_SERVO8_MICROSECONDS));
     zoneDaoHashMap.put(
         GARDEROBA,
         createZone(
-            FunctionType.AIR_EXTRACT,
+            FunctionTypeUtil.determinateFunctionType(GARDEROBA),
             GARDEROBA_OPEN_POSITION,
             GARDEROBA_CLOSE_POSITION,
             WRITE_SERVO9_MICROSECONDS));
     zoneDaoHashMap.put(
         NATALIA,
         createZone(
-            FunctionType.AIR_SUPPLY,
+            FunctionTypeUtil.determinateFunctionType(NATALIA),
             NATALIA_OPEN_POSITION,
             NATALIA_CLOSE_POSITION,
             WRITE_SERVO10_MICROSECONDS));
     zoneDaoHashMap.put(
         LAZ_GORA,
         createZone(
-            FunctionType.AIR_EXTRACT,
+            FunctionTypeUtil.determinateFunctionType(LAZ_GORA),
             LAZ_GORA_OPEN_POSITION,
             LAZ_GORA_CLOSE_POSITION,
             WRITE_SERVO11_MICROSECONDS));
     zoneDaoHashMap.put(
         KAROLINA,
         createZone(
-            FunctionType.AIR_SUPPLY,
+            FunctionTypeUtil.determinateFunctionType(KAROLINA),
             KAROLINA_OPEN_POSITION,
             KAROLINA_CLOSE_POSITION,
             WRITE_SERVO12_MICROSECONDS));
