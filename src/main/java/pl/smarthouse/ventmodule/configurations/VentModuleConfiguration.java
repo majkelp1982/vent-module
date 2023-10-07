@@ -18,6 +18,7 @@ import pl.smarthouse.sharedobjects.utils.FunctionTypeUtil;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280Response;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Result;
 import pl.smarthouse.smartmodule.model.actors.type.pca9685.Pca9685CommandType;
+import pl.smarthouse.smartmonitoring.model.BooleanCompareProperties;
 import pl.smarthouse.smartmonitoring.model.EnumCompareProperties;
 import pl.smarthouse.smartmonitoring.model.NumberCompareProperties;
 import pl.smarthouse.smartmonitoring.properties.defaults.Bme280DefaultProperties;
@@ -79,6 +80,10 @@ public class VentModuleConfiguration {
   }
 
   private void createCompareMap() {
+    compareProcessor.addMap("error", BooleanCompareProperties.builder().saveEnabled(true).build());
+    compareProcessor.addMap(
+        "errorPendingAcknowledge", BooleanCompareProperties.builder().saveEnabled(true).build());
+
     compareProcessor.addMap(
         "airCondition", EnumCompareProperties.builder().saveEnabled(true).build());
 
