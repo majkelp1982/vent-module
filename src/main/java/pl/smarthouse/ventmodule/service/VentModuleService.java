@@ -7,9 +7,7 @@ import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.configurations.VentModuleConfiguration;
-import pl.smarthouse.ventmodule.model.core.Fan;
-import pl.smarthouse.ventmodule.model.core.Fans;
-import pl.smarthouse.ventmodule.model.core.Throttle;
+import pl.smarthouse.ventmodule.model.core.*;
 import pl.smarthouse.ventmodule.model.dao.VentModuleDao;
 import pl.smarthouse.ventmodule.model.dao.ZoneDao;
 import pl.smarthouse.ventmodule.utils.ModelMapper;
@@ -28,6 +26,14 @@ public class VentModuleService {
 
   public Mono<VentModuleDao> getVentModuleDao() {
     return Mono.just(ventModuleConfiguration.getVentModuleDao());
+  }
+
+  public AirExchanger getAirExchanger() {
+    return ventModuleConfiguration.getVentModuleDao().getAirExchanger();
+  }
+
+  public ForcedAirSystemExchanger getForcedAirSystemExchanger() {
+    return ventModuleConfiguration.getVentModuleDao().getForcedAirSystemExchanger();
   }
 
   public Mono<String> getModuleName() {
