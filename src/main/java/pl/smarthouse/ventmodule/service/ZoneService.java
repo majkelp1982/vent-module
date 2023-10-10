@@ -23,7 +23,7 @@ public class ZoneService {
   private static final String LOG_RESET_ZONE =
       "Zone: {}, will be reset due to last update is over: {} minutes ago";
   private static final String ERROR_POWER_REQUIRED =
-      "Zone name: %s, operation: %s need requiresPower parameter between 0 and 100";
+      "Zone name: %s, operation: %s need requiresPower parameter between 10 and 100";
   private static final String ERROR_WRONG_OPERATION =
       "Zone name: %s, operation: %s is not allowed for channel type: %s. Allowed operations: %s";
   private final int ZONE_OUTDATED_IN_MINUTES = 2;
@@ -127,11 +127,10 @@ public class ZoneService {
       final ZoneDao zoneDao,
       final Operation operation,
       final int requestPower) {
-    if (!Operation.STANDBY.equals(operation) && requestPower == 0) {
-      throw new InvalidZoneOperationException(
-          String.format(ERROR_POWER_REQUIRED, zoneName, operation));
+    if (List.of(Operation.STANDBY, Operation.FLOOR_HEATING).contains(operation)) {
+      return;
     }
-    if ((requestPower < 0) || (requestPower > 100)) {
+    if ((requestPower < 10) || (requestPower > 100)) {
       throw new InvalidZoneOperationException(
           String.format(ERROR_POWER_REQUIRED, zoneName, operation));
     }
