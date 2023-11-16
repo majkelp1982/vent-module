@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRange;
+import pl.smarthouse.sharedobjects.dto.core.TimeRange;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
 
 class FanUtilsTest {

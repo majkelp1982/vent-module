@@ -2,7 +2,7 @@ package pl.smarthouse.ventmodule.utils;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import lombok.experimental.UtilityClass;
-import pl.smarthouse.sharedobjects.dto.comfort.core.TimeRange;
+import pl.smarthouse.sharedobjects.dto.core.TimeRange;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
 
 @UtilityClass
