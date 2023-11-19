@@ -5,13 +5,7 @@ public class ThrottleProperties {
   public static final String THROTTLES = "throttles";
   public static final int THROTTLES_SERVO_FREQUENCY_HZ = 50;
 
-  // INTAKE THROTTLE
-  public static final int THROTTLE_INTAKE_INTERNAL_SOURCE = 960;
-  public static final int THROTTLE_INTAKE_EXTERNAL_SOURCE = 1960;
-
   // Zone throttles
-  public static final int SALON_OPEN_POSITION = 960;
-  public static final int SALON_CLOSE_POSITION = 1960;
   public static final int KUCHNIA_OPEN_POSITION = 960;
   public static final int KUCHNIA_CLOSE_POSITION = 1960;
   public static final int LAZ_DOL_OPEN_POSITION = 960;
@@ -27,6 +21,13 @@ public class ThrottleProperties {
   public static final int LAZ_GORA_OPEN_POSITION = 960;
   public static final int LAZ_GORA_CLOSE_POSITION = 1960;
   // Settings checked
+  // INTAKE THROTTLE
+  public static final int THROTTLE_INTAKE_INTERNAL_SOURCE = 1960;
+  public static final int THROTTLE_INTAKE_EXTERNAL_SOURCE = 960;
+
+  // Zone throttles
+  public static final int SALON_OPEN_POSITION = 1000;
+  public static final int SALON_CLOSE_POSITION = 2000;
   public static final int KAROLINA_OPEN_POSITION = 850;
   public static final int KAROLINA_CLOSE_POSITION = 1900;
   public static final int RODZICE_OPEN_POSITION = 910;

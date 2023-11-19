@@ -1,5 +1,7 @@
 package pl.smarthouse.ventmodule.service;
 
+import static pl.smarthouse.sharedobjects.enums.Operation.*;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +24,12 @@ public class ThrottlesService {
         .map(
             zoneDao -> {
               final Throttle throttle = zoneDao.getThrottle();
-              if (Operation.STANDBY.equals(zoneDao.getOperation())) {
-                throttle.setGoalPosition(throttle.getClosePosition());
-              } else {
+              final List<Operation> requireOpenPositionOperations =
+                  List.of(AIR_EXCHANGE, AIR_HEATING, AIR_COOLING, AIR_CONDITION);
+              if (requireOpenPositionOperations.contains(zoneDao.getOperation())) {
                 throttle.setGoalPosition(throttle.getOpenPosition());
+              } else {
+                throttle.setGoalPosition(throttle.getClosePosition());
               }
               return zoneDao.getOperation();
             })
