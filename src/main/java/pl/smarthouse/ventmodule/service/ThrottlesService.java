@@ -63,13 +63,15 @@ public class ThrottlesService {
                           return Mono.just(throttle);
                         });
               }
-
-              if (operations.contains(Operation.AIR_HEATING)) {
+              final List externalIntakeAllowedOperations =
+                  List.of(AIR_EXCHANGE, STANDBY, FLOOR_HEATING, HUMIDITY_ALERT);
+              if (externalIntakeAllowedOperations.containsAll(operations)
+                  && operations.contains(AIR_EXCHANGE)) {
                 return ventModuleService
                     .getIntakeThrottle()
                     .flatMap(
                         throttle -> {
-                          throttle.setGoalPosition(throttle.getClosePosition());
+                          throttle.setGoalPosition(throttle.getOpenPosition());
                           return Mono.just(throttle);
                         });
               } else {
@@ -77,7 +79,7 @@ public class ThrottlesService {
                     .getIntakeThrottle()
                     .flatMap(
                         throttle -> {
-                          throttle.setGoalPosition(throttle.getOpenPosition());
+                          throttle.setGoalPosition(throttle.getClosePosition());
                           return Mono.just(throttle);
                         });
               }
