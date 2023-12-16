@@ -3,12 +3,11 @@ package pl.smarthouse.ventmodule.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.server.ServerResponse;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
-import pl.smarthouse.ventmodule.service.FireplaceAirOverpressureService;
 import pl.smarthouse.ventmodule.service.VentModuleParamsService;
 import pl.smarthouse.ventmodule.service.VentModuleService;
+import pl.smarthouse.ventmodule.service.airoverpressure.AirOverpressureStateCalculator;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -17,7 +16,7 @@ import reactor.core.publisher.Mono;
 public class VentModuleController {
   private final VentModuleService ventModuleService;
   private final VentModuleParamsService ventModuleParamsService;
-  private final FireplaceAirOverpressureService fireplaceAirOverpressureService;
+  private final AirOverpressureStateCalculator airOverpressureStateCalculator;
 
   @GetMapping("/vent")
   public Mono<VentModuleDto> getVentModule() {
@@ -25,9 +24,10 @@ public class VentModuleController {
   }
 
   @PostMapping("/vent/overpressure/force")
-  public Mono<ServerResponse> forceOverpressure() {
-    fireplaceAirOverpressureService.forceOverpressure();
-    return ServerResponse.status(HttpStatus.ACCEPTED).build();
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public Mono<Void> forceOverpressure() {
+    airOverpressureStateCalculator.forceOverpressure();
+    return Mono.empty();
   }
 
   @PostMapping("/params")
@@ -38,6 +38,6 @@ public class VentModuleController {
 
   @GetMapping("/params")
   public Mono<VentModuleParamsDto> getParams() {
-    return ventModuleParamsService.getParams();
+    return Mono.just(ventModuleParamsService.getParams());
   }
 }

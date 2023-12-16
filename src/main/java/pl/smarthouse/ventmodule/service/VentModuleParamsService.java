@@ -4,6 +4,8 @@ import java.util.NoSuchElementException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
 import pl.smarthouse.ventmodule.model.dao.VentModuleParamsDao;
@@ -13,10 +15,12 @@ import reactor.core.publisher.Mono;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@EnableScheduling
 public class VentModuleParamsService {
   private final ParamsRepository paramsRepository;
   private final VentModuleService ventModuleService;
   private final ModelMapper modelMapper = new ModelMapper();
+  private VentModuleParamsDto ventModuleParamsDto;
 
   public Mono<VentModuleParamsDto> saveParams(final VentModuleParamsDto ventModuleParamsDto) {
     return getParamTableName()
@@ -25,8 +29,8 @@ public class VentModuleParamsService {
                 paramsRepository.saveParams(
                     modelMapper.map(ventModuleParamsDto, VentModuleParamsDao.class),
                     paramTableName))
-        .map(
-            VentModuleParamsDao -> modelMapper.map(VentModuleParamsDao, VentModuleParamsDto.class));
+        .doOnNext(ventModuleParamsDao -> refreshParams())
+        .thenReturn(ventModuleParamsDto);
   }
 
   private Mono<String> getParamTableName() {
@@ -35,8 +39,18 @@ public class VentModuleParamsService {
         .map(moduleName -> moduleName.toLowerCase() + "_settings");
   }
 
-  public Mono<VentModuleParamsDto> getParams() {
-    return getParamTableName()
+  public VentModuleParamsDto getParams() {
+    if (ventModuleParamsDto == null) {
+      refreshParams();
+    }
+    while (ventModuleParamsDto == null) {}
+
+    return ventModuleParamsDto;
+  }
+
+  @Scheduled(initialDelay = 5000, fixedDelay = 60 * 1000)
+  private void refreshParams() {
+    getParamTableName()
         .flatMap(
             paramTableName ->
                 paramsRepository
@@ -46,7 +60,8 @@ public class VentModuleParamsService {
                             log.debug("Successfully retrieve params: {}", ventModuleParamsDao))
                     .map(
                         ventModuleParamsDao ->
-                            modelMapper.map(ventModuleParamsDao, VentModuleParamsDto.class))
+                            ventModuleParamsDto =
+                                modelMapper.map(ventModuleParamsDao, VentModuleParamsDto.class))
                     .onErrorResume(
                         NoSuchElementException.class,
                         throwable -> {
@@ -61,6 +76,7 @@ public class VentModuleParamsService {
                                 throwable))
                     .doOnSubscribe(
                         subscription ->
-                            log.debug("Get module params from collection: {}", paramTableName)));
+                            log.debug("Get module params from collection: {}", paramTableName)))
+        .subscribe();
   }
 }

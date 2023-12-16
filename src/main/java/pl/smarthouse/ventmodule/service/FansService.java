@@ -4,7 +4,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.ventmodule.utils.FanUtils;
 import reactor.core.publisher.Mono;
 
@@ -45,6 +47,16 @@ public class FansService {
               return zoneDao;
             })
         .collectList()
+        .doOnNext(
+            zoneDaoList -> {
+              if (State.ON.equals(
+                  ventModuleService.getVentModuleDao().getFireplaceAirOverpressureActive())) {
+                FanUtils.recalculateFansSpeedWhenAirOverpressureRequested(
+                    inletRequiredGoalPower,
+                    outletRequiredGoalPower,
+                    ventModuleParamsService.getParams().getFireplaceAirOverpressureLevel());
+              }
+            })
         .flatMap(
             zoneDaoList ->
                 setRequiredPower(inletRequiredGoalPower.get(), outletRequiredGoalPower.get()));
@@ -52,29 +64,24 @@ public class FansService {
 
   private Mono<Void> setRequiredPower(
       final int inletRequiredGoalPower, final int outletRequiredGoalPower) {
+
     return ventModuleService
         .getFans()
-        .flatMap(
-            fans ->
-                ventModuleParamsService
-                    .getParams()
-                    .map(
-                        ventModuleParamsDto -> {
-                          fans.getInlet()
-                              .setGoalSpeed(
-                                  FanUtils.validateRequiredGoalPower(
-                                      ventModuleParamsDto,
-                                      inletRequiredGoalPower,
-                                      ventModuleParamsDto.getInletFanNightHoursMaxPower()));
+        .doOnNext(
+            fans -> {
+              final VentModuleParamsDto params = ventModuleParamsService.getParams();
+              fans.getInlet()
+                  .setGoalSpeed(
+                      FanUtils.validateRequiredGoalPower(
+                          params, inletRequiredGoalPower, params.getInletFanNightHoursMaxPower()));
 
-                          fans.getOutlet()
-                              .setGoalSpeed(
-                                  FanUtils.validateRequiredGoalPower(
-                                      ventModuleParamsDto,
-                                      outletRequiredGoalPower,
-                                      ventModuleParamsDto.getOutletFanNightHoursMaxPower()));
-                          return fans;
-                        })
-                    .then());
+              fans.getOutlet()
+                  .setGoalSpeed(
+                      FanUtils.validateRequiredGoalPower(
+                          params,
+                          outletRequiredGoalPower,
+                          params.getOutletFanNightHoursMaxPower()));
+            })
+        .then();
   }
 }

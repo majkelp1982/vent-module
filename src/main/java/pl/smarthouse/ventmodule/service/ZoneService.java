@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.ZoneDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.exceptions.InvalidZoneOperationException;
@@ -33,8 +34,7 @@ public class ZoneService {
 
   public Mono<ZoneDto> setZoneOperation(
       final ZoneName zoneName, final Operation operation, final int requestPower) {
-    return ventModuleParamsService
-        .getParams()
+    return Mono.just(ventModuleParamsService.getParams())
         .map(ventModuleParamsDto -> recalculateOperation(ventModuleParamsDto, operation))
         .flatMap(
             recalculatedOperation ->
@@ -48,10 +48,25 @@ public class ZoneService {
                           } else {
                             zoneDao.setRequiredPower(0);
                           }
-                          zoneDao.setOperation(recalculatedOperation);
+                          if (zoneName.equals(ZoneName.SALON)
+                              && isOverrideSalonZoneNeededDueToOverPressureRequested()) {
+                            zoneDao.setRequiredPower(
+                                ventModuleParamsService
+                                    .getParams()
+                                    .getFireplaceAirOverpressureLevel());
+                            zoneDao.setOperation(Operation.AIR_EXCHANGE);
+                          } else {
+
+                            zoneDao.setOperation(recalculatedOperation);
+                          }
                           return Mono.just(zoneDao);
                         }))
         .map(ModelMapper::toZoneDto);
+  }
+
+  private boolean isOverrideSalonZoneNeededDueToOverPressureRequested() {
+    return State.ON.equals(
+        ventModuleService.getVentModuleDao().getFireplaceAirOverpressureActive());
   }
 
   public Mono<HashMap<ZoneName, ZoneDto>> getActiveZones() {

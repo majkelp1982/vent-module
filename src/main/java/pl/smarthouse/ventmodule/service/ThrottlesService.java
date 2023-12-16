@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.IntakeThrottleMode;
+import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.sharedobjects.enums.Operation;
 import pl.smarthouse.ventmodule.model.core.Throttle;
 import reactor.core.publisher.Mono;
@@ -54,7 +55,9 @@ public class ThrottlesService {
                         });
               }
 
-              if (IntakeThrottleMode.FORCED_OUTSIDE.equals(intakeThrottleMode)) {
+              if (State.ON.equals(
+                      ventModuleService.getVentModuleDao().getFireplaceAirOverpressureActive())
+                  || IntakeThrottleMode.FORCED_OUTSIDE.equals(intakeThrottleMode)) {
                 return ventModuleService
                     .getIntakeThrottle()
                     .flatMap(

@@ -44,4 +44,16 @@ public class FanUtils {
       goalPower.set(0);
     }
   }
+
+  public void recalculateFansSpeedWhenAirOverpressureRequested(
+      final AtomicInteger inletRequiredGoalPower,
+      final AtomicInteger outletRequiredGoalPower,
+      final int requestedSpeedDifference) {
+    if (inletRequiredGoalPower.get() - outletRequiredGoalPower.get() < requestedSpeedDifference) {
+      inletRequiredGoalPower.set(outletRequiredGoalPower.get());
+      addAndValidateRequiredPower(inletRequiredGoalPower, requestedSpeedDifference);
+      outletRequiredGoalPower.set(inletRequiredGoalPower.get());
+      addAndValidateRequiredPower(outletRequiredGoalPower, (requestedSpeedDifference * (-1)));
+    }
+  }
 }
