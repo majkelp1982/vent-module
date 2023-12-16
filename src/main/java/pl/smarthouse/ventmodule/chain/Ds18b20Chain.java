@@ -13,6 +13,7 @@ import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20CommandType;
 import pl.smarthouse.smartmodule.model.actors.type.ds18b20.Ds18b20Utils;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
+import pl.smarthouse.ventmodule.model.core.ForcedAirSystemExchanger;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 
 @Service
@@ -73,26 +74,16 @@ public class Ds18b20Chain {
 
   private Runnable createActionStep2() {
     return () -> {
-      ventModuleService
-          .getVentModuleDao()
-          .map(
-              ventModuleDao -> {
-                ventModuleDao
-                    .getForcedAirSystemExchanger()
-                    .setWatterIn(airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_IN));
-                ventModuleDao
-                    .getForcedAirSystemExchanger()
-                    .setWatterOut(airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_OUT));
-                ventModuleDao
-                    .getForcedAirSystemExchanger()
-                    .setAirIn(airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_IN));
-                ventModuleDao
-                    .getForcedAirSystemExchanger()
-                    .setAirOut(airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_OUT));
-                return ventModuleDao;
-              })
-          .subscribe();
-
+      final ForcedAirSystemExchanger forcedAirSystemExchanger =
+          ventModuleService.getVentModuleDao().getForcedAirSystemExchanger();
+      forcedAirSystemExchanger.setWatterIn(
+          airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_IN));
+      forcedAirSystemExchanger.setWatterOut(
+          airExchanger.getResponse().getSensorResult(EXCHANGER_WATTER_OUT));
+      forcedAirSystemExchanger.setAirIn(
+          airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_IN));
+      forcedAirSystemExchanger.setAirOut(
+          airExchanger.getResponse().getSensorResult(EXCHANGER_AIR_OUT));
       airExchanger.getCommandSet().setCommandType(Ds18b20CommandType.NO_ACTION);
     };
   }

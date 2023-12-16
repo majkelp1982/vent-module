@@ -14,6 +14,7 @@ import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280CommandType;
 import pl.smarthouse.smartmodule.model.actors.type.bme280.Bme280Response;
 import pl.smarthouse.smartmodule.model.enums.ActorType;
 import pl.smarthouse.ventmodule.configurations.Esp32ModuleConfig;
+import pl.smarthouse.ventmodule.model.core.AirExchanger;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 
 @Service
@@ -66,26 +67,11 @@ public class Bme280Chain {
 
   private Runnable createActionStep2() {
     return () -> {
-      ventModuleService
-          .getVentModuleDao()
-          .map(
-              ventModuleDao -> {
-                ventModuleDao
-                    .getAirExchanger()
-                    .setInlet((Bme280Response) actorMap.getActor(BME280_INLET).getResponse());
-                ventModuleDao
-                    .getAirExchanger()
-                    .setOutlet((Bme280Response) actorMap.getActor(BME280_OUTLET).getResponse());
-                ventModuleDao
-                    .getAirExchanger()
-                    .setFreshAir(
-                        (Bme280Response) actorMap.getActor(BME280_FRESH_AIR).getResponse());
-                ventModuleDao
-                    .getAirExchanger()
-                    .setUserAir((Bme280Response) actorMap.getActor(BME280_USED_AIR).getResponse());
-                return ventModuleDao;
-              })
-          .subscribe();
+      final AirExchanger airExchanger = ventModuleService.getVentModuleDao().getAirExchanger();
+      airExchanger.setInlet((Bme280Response) actorMap.getActor(BME280_INLET).getResponse());
+      airExchanger.setOutlet((Bme280Response) actorMap.getActor(BME280_OUTLET).getResponse());
+      airExchanger.setFreshAir((Bme280Response) actorMap.getActor(BME280_FRESH_AIR).getResponse());
+      airExchanger.setUserAir((Bme280Response) actorMap.getActor(BME280_USED_AIR).getResponse());
       ActionUtils.setActionToAllActorType(actorMap, ActorType.BME280, Bme280CommandType.NO_ACTION);
     };
   }

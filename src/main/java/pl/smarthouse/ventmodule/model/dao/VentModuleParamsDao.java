@@ -12,6 +12,8 @@ import pl.smarthouse.sharedobjects.dto.ventilation.enums.IntakeThrottleMode;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VentModuleParamsDao {
+  private boolean fireplaceAirOverpressureEnabled;
+  private int fireplaceAirOverpressureLevel;
   private boolean humidityAlertEnabled;
   private boolean airExchangeEnabled;
   private boolean airHeatingEnabled;

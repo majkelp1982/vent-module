@@ -20,6 +20,7 @@ public class VentModuleDao extends ModuleDao {
   private final Throttle intakeThrottle;
   private final AirExchanger airExchanger;
   private final ForcedAirSystemExchanger forcedAirSystemExchanger;
+  private State fireplaceAirOverpressureActive;
   private State circuitPump;
   private State airCondition;
 }

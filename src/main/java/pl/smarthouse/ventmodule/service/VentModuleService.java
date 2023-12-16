@@ -20,12 +20,12 @@ import reactor.core.publisher.Mono;
 public class VentModuleService {
   private final VentModuleConfiguration ventModuleConfiguration;
 
-  public Mono<VentModuleDto> getVentModule() {
-    return Mono.just(ModelMapper.toVentModuleDto(ventModuleConfiguration.getVentModuleDao()));
+  public VentModuleDto getVentModule() {
+    return ModelMapper.toVentModuleDto(ventModuleConfiguration.getVentModuleDao());
   }
 
-  public Mono<VentModuleDao> getVentModuleDao() {
-    return Mono.just(ventModuleConfiguration.getVentModuleDao());
+  public VentModuleDao getVentModuleDao() {
+    return ventModuleConfiguration.getVentModuleDao();
   }
 
   public AirExchanger getAirExchanger() {

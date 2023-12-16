@@ -74,6 +74,7 @@ public class VentModuleConfiguration {
                     .build())
             .airCondition(State.OFF)
             .circuitPump(State.OFF)
+            .fireplaceAirOverpressureActive(State.OFF)
             .build();
     monitoringService.setModuleDaoObject(ventModuleDao);
     createCompareMap();
@@ -85,15 +86,17 @@ public class VentModuleConfiguration {
         "errorPendingAcknowledge", BooleanCompareProperties.builder().saveEnabled(true).build());
 
     compareProcessor.addMap(
+        "fireplaceAirOverpressureActive",
+        EnumCompareProperties.builder().saveEnabled(true).build());
+    compareProcessor.addMap(
         "airCondition", EnumCompareProperties.builder().saveEnabled(true).build());
+    compareProcessor.addMap(
+        "circuitPump", EnumCompareProperties.builder().saveEnabled(true).build());
 
     Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.freshAir");
     Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.inlet");
     Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.outlet");
     Bme280DefaultProperties.setDefaultProperties(compareProcessor, "airExchanger.userAir");
-
-    compareProcessor.addMap(
-        "circuitPump", EnumCompareProperties.builder().saveEnabled(true).build());
 
     compareProcessor.addMap("fans.inlet.currentSpeed", FanProperties.getSpeedProperties());
     compareProcessor.addMap("fans.inlet.goalSpeed", FanProperties.getSpeedProperties());

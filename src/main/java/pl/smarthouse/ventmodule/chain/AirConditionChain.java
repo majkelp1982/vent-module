@@ -115,15 +115,8 @@ public class AirConditionChain {
     return () -> {
       ventModuleService
           .getVentModuleDao()
-          .map(
-              ventModuleDao -> {
-                ventModuleDao.setAirCondition(
-                    (airCondition.getResponse().getPinState() == PinState.HIGH)
-                        ? State.OFF
-                        : State.ON);
-                return ventModuleDao;
-              })
-          .subscribe();
+          .setAirCondition(
+              (airCondition.getResponse().getPinState() == PinState.HIGH) ? State.OFF : State.ON);
       airCondition.getCommandSet().setCommandType(PwmCommandType.NO_ACTION);
     };
   }

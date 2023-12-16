@@ -118,13 +118,8 @@ public class PumpChain {
     return () -> {
       ventModuleService
           .getVentModuleDao()
-          .map(
-              ventModuleDao -> {
-                ventModuleDao.setCircuitPump(
-                    (pump.getResponse().getPinState() == PinState.HIGH) ? State.OFF : State.ON);
-                return ventModuleDao;
-              })
-          .subscribe();
+          .setCircuitPump(
+              (pump.getResponse().getPinState() == PinState.HIGH) ? State.OFF : State.ON);
       pump.getCommandSet().setCommandType(PwmCommandType.NO_ACTION);
     };
   }

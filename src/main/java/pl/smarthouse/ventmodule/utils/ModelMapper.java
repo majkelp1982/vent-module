@@ -28,6 +28,7 @@ public class ModelMapper {
             toForcedAirSystemExchangerDto(ventModuleDao.getForcedAirSystemExchanger()))
         .circuitPump(ventModuleDao.getCircuitPump())
         .airCondition(ventModuleDao.getAirCondition())
+        .fireplaceAirOverpressureActive(ventModuleDao.getFireplaceAirOverpressureActive())
         .build();
   }
 
