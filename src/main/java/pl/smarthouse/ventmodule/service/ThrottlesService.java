@@ -39,8 +39,7 @@ public class ThrottlesService {
   }
 
   private Mono<Throttle> calculateIntakeThrottlePosition(final List<Operation> operations) {
-    return ventModuleParamsService
-        .getParams()
+    return Mono.just(ventModuleParamsService.getParams())
         .flatMap(
             ventModuleParamsDto -> {
               final IntakeThrottleMode intakeThrottleMode =

@@ -31,7 +31,6 @@ public class FansService {
                   if (FunctionType.AIR_EXTRACT.equals(zoneDao.getFunctionType())) {
                     FanUtils.addAndValidateRequiredPower(outletRequiredGoalPower, requiredPower);
                   } else {
-
                     FanUtils.addAndValidateRequiredPower(inletRequiredGoalPower, requiredPower);
                   }
                   break;
