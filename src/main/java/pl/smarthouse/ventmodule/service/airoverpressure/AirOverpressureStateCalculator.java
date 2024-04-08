@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.ventmodule.service.VentModuleParamsService;
 import pl.smarthouse.ventmodule.service.VentModuleService;
 

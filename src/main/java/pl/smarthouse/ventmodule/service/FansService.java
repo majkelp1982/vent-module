@@ -4,9 +4,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.dto.ventilation.VentModuleParamsDto;
 import pl.smarthouse.sharedobjects.dto.ventilation.enums.FunctionType;
-import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
 import pl.smarthouse.ventmodule.utils.FanUtils;
 import reactor.core.publisher.Mono;
 

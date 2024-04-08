@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Transient;
 import pl.smarthouse.sharedobjects.dao.ModuleDao;
-import pl.smarthouse.sharedobjects.dto.ventilation.enums.State;
+import pl.smarthouse.sharedobjects.dto.core.enums.State;
 import pl.smarthouse.sharedobjects.enums.ZoneName;
 import pl.smarthouse.ventmodule.model.core.AirExchanger;
 import pl.smarthouse.ventmodule.model.core.Fans;

@@ -89,7 +89,7 @@ public class Esp32ModuleConfig {
     actorMap.putActor(
         new Pin(PUMP, CIRCUIT_PUMP_PIN, PinMode.OUTPUT, PUMP_DEFAULT_STATE, PUMP_DEFAULT_ENABLED));
 
-    // Circuit pump
+    // Air condition device
     actorMap.putActor(
         new Pin(
             AIR_CONDITION,
