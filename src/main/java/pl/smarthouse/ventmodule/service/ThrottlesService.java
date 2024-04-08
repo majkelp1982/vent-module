@@ -64,7 +64,7 @@ public class ThrottlesService {
       throttle.setGoalPosition(throttle.getClosePosition());
       return throttle;
     }
-    
+
     determinateThrottlePositionByExternalTemperature(throttle, ventModuleParamsDto);
     return throttle;
   }
