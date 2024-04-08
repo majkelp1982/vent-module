@@ -21,6 +21,7 @@ public class VentModuleParamsDao {
   private boolean airConditionEnabled;
   private boolean nightHoursEnabled;
   private IntakeThrottleMode intakeThrottleMode;
+  private double outsideIntakeThreshold;
 
   private TimeRange nightHours;
   private int inletFanNightHoursMaxPower;

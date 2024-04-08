@@ -53,8 +53,8 @@ public class VentModuleService {
                 ventModuleConfiguration.getVentModuleDao().getZoneDaoHashMap().get(zoneName));
   }
 
-  public Mono<Throttle> getIntakeThrottle() {
-    return Mono.just(ventModuleConfiguration.getVentModuleDao().getIntakeThrottle());
+  public Throttle getIntakeThrottle() {
+    return ventModuleConfiguration.getVentModuleDao().getIntakeThrottle();
   }
 
   public Mono<HashMap<ZoneName, ZoneDao>> getZonesFullData() {

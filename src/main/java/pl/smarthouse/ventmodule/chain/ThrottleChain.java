@@ -71,7 +71,7 @@ public class ThrottleChain {
                 this.throttle = throttle;
                 return Mono.just(throttle);
               })
-          .switchIfEmpty(Mono.defer(ventModuleService::getIntakeThrottle))
+          .switchIfEmpty(Mono.just(ventModuleService.getIntakeThrottle()))
           .filter(throttle -> (throttle.getCurrentPosition() != throttle.getGoalPosition()))
           .flatMap(
               throttle -> {
