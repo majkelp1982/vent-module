@@ -43,7 +43,7 @@ public class VentModuleConfiguration {
   void postConstruct() {
     ventModuleDao =
         VentModuleDao.builder()
-            .moduleName(Esp32ModuleProperties.MODULE_TYPE)
+            .type(Esp32ModuleProperties.MODULE_TYPE)
             .zoneDaoHashMap(createZones())
             .fans(
                 Fans.builder()

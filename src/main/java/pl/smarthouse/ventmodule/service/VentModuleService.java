@@ -37,7 +37,7 @@ public class VentModuleService {
   }
 
   public Mono<String> getModuleName() {
-    return Mono.just(ventModuleConfiguration.getVentModuleDao().getModuleName());
+    return Mono.just(ventModuleConfiguration.getVentModuleDao().getType());
   }
 
   public Mono<ZoneDao> getZone(final ZoneName zoneName) {
