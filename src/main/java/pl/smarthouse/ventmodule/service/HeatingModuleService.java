@@ -29,6 +29,11 @@ public class HeatingModuleService {
               } else {
                 return clientResponse.createException().flatMap(Mono::error);
               }
+            })
+        .onErrorResume(
+            throwable -> {
+              log.warn("Heating module connection problem. Message: {}", throwable.getMessage());
+              return Mono.empty();
             });
   }
 }

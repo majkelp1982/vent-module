@@ -37,6 +37,9 @@ public class AirOverpressureStateCalculator {
   }
 
   private boolean isOverpressureEnabled() {
+    if (ventModuleParamsService.getParams() == null) {
+      return false;
+    }
     return ventModuleParamsService.getParams().isFireplaceAirOverpressureEnabled();
   }
 }

@@ -21,6 +21,9 @@ public class FansService {
   public Mono<Void> setFansRequiredPower() {
     final AtomicInteger inletRequiredGoalPower = new AtomicInteger(0);
     final AtomicInteger outletRequiredGoalPower = new AtomicInteger(0);
+    if (ventModuleParamsService.getParams() == null) {
+      return Mono.empty();
+    }
     return ventModuleService
         .getAllZones()
         .map(
@@ -63,6 +66,9 @@ public class FansService {
 
   private Mono<Void> setRequiredPower(
       final int inletRequiredGoalPower, final int outletRequiredGoalPower) {
+    if (ventModuleParamsService.getParams() == null) {
+      return Mono.empty();
+    }
 
     return ventModuleService
         .getFans()

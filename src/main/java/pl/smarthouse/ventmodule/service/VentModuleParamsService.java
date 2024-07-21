@@ -41,9 +41,9 @@ public class VentModuleParamsService {
 
   public VentModuleParamsDto getParams() {
     if (ventModuleParamsDto == null) {
+      log.warn("Waiting for module params");
       refreshParams();
     }
-    while (ventModuleParamsDto == null) {}
 
     return ventModuleParamsDto;
   }

@@ -23,12 +23,17 @@ public class WeatherModuleService {
       "^(?:http:\\/\\/)?\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{1,5}$";
   private WeatherModuleDto weatherModuleMetaData;
 
-  @Scheduled(fixedDelay = 30000)
+  @Scheduled(initialDelay = 10000, fixedDelay = 30000)
   private void refreshWeatherModuleDataScheduler() {
     getWeatherModuleMetaData()
         .doOnNext(weatherModuleDto -> weatherModuleMetaData = weatherModuleDto)
         .doOnNext(weatherModuleDto -> log.info("Retrieved module data: {}", weatherModuleDto))
-        .block();
+        .onErrorResume(
+            throwable -> {
+              log.warn("Heating module connection problem. Message: {}", throwable.getMessage());
+              return Mono.empty();
+            })
+        .subscribe();
   }
 
   private Mono<String> retrieveWeatherServiceBaseUrl() {

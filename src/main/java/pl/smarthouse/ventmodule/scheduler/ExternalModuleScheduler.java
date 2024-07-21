@@ -40,6 +40,6 @@ public class ExternalModuleScheduler {
               }
               return Mono.empty();
             })
-        .block();
+        .subscribe();
   }
 }

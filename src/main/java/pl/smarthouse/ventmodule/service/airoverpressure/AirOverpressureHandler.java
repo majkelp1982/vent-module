@@ -24,6 +24,10 @@ public class AirOverpressureHandler {
 
   @Scheduled(initialDelay = 10000, fixedDelay = 10000)
   private void handle() {
+    if (ventModuleParamsService.getParams() == null) {
+      return;
+    }
+
     airOverpressureStateCalculator.calculate();
 
     if (State.ON.equals(ventModuleService.getVentModuleDao().getFireplaceAirOverpressureActive())) {

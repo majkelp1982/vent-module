@@ -34,6 +34,9 @@ public class ZoneService {
 
   public Mono<ZoneDto> setZoneOperation(
       final ZoneName zoneName, final Operation operation, final int requestPower) {
+    if (ventModuleParamsService.getParams() == null) {
+      return Mono.empty();
+    }
     return Mono.just(ventModuleParamsService.getParams())
         .map(ventModuleParamsDto -> recalculateOperation(ventModuleParamsDto, operation))
         .flatMap(

@@ -44,6 +44,9 @@ public class ThrottlesService {
   private Throttle calculateIntakeThrottlePosition(final List<Operation> operations) {
     final VentModuleParamsDto ventModuleParamsDto = ventModuleParamsService.getParams();
     final Throttle throttle = ventModuleService.getIntakeThrottle();
+    if (ventModuleParamsDto == null) {
+      return throttle;
+    }
 
     // Check position base on manual or auto mode
     final IntakeThrottleMode intakeThrottleMode = ventModuleParamsDto.getIntakeThrottleMode();
